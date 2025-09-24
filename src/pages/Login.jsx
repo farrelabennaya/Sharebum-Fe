@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiPost } from "../lib/api.js";
 import useGoogleId from "../hooks/useGoogleId.js";
+import TurnstileBox from "../components/TurnstileBox.jsx";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
@@ -22,39 +23,50 @@ export default function Login({ embedded = false }) {
   const [fieldErrs, setFieldErrs] = useState({});
   const [loading, setLoading] = useState(false);
   const [gLoading, setGLoading] = useState(false);
+  const [cfToken, setCfToken] = useState(null); // token 
+  const cfRef = useRef(null);
+useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
   const nav = useNavigate();
 
   // === GOOGLE LOGIN SETUP ===
   const googleBtnRef = useRef(null);
   const { ready, renderButton } = useGoogleId({
-    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-    onCredential: async (idToken) => {
-      setErr(null);
-      setGLoading(true);
-      try {
-        // Kirim ID Token ke backend untuk diverifikasi
-        const res = await apiPost("/api/auth/google", { id_token: idToken });
-        // backend membalas token app-mu
-        if (res?.token) {
-          localStorage.setItem("token", res.token);
-          nav("/dashboard");
-        } else {
-          throw new Error("Login Google gagal: token tidak ditemukan.");
-        }
-      } catch (e) {
-        setErr(
-          e?.status === 401
-            ? "Login Google ditolak."
-            : String(e?.message || "Gagal login Google")
-        );
-      } finally {
-        setGLoading(false);
+  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  onCredential: async (idToken) => {
+    // pakai nilai terbaru dari ref, bukan cfToken (yang bisa stale)
+    if (!cfRef.current) {
+      setErr("Silakan verifikasi manusia terlebih dahulu.");
+      return;
+    }
+    setErr(null);
+    setGLoading(true);
+    try {
+      const res = await apiPost("/api/auth/google", {
+        id_token: idToken,
+        "cf-turnstile-response": cfRef.current, // <<< penting
+      });
+      if (res?.token) {
+        localStorage.setItem("token", res.token);
+        nav("/dashboard");
+      } else {
+        throw new Error("Login Google gagal: token tidak ditemukan.");
       }
-    },
-  });
+    } catch (e) {
+      setErr(
+        e?.status === 401
+          ? "Login Google ditolak."
+          : String(e?.message || "Gagal login Google")
+      );
+    } finally {
+      setGLoading(false);
+    }
+  },
+});
+
 
   useEffect(() => {
-    if (ready && googleBtnRef.current) {
+    if (ready && cfToken && googleBtnRef.current) {
+      googleBtnRef.current.innerHTML = ""; // bersihkan biar tidak dobel
       renderButton(googleBtnRef.current, {
         theme: "filled_black",
         size: "large",
@@ -64,11 +76,15 @@ export default function Login({ embedded = false }) {
         width: "100%", // penting biar area klik/DOM pas
       });
     }
-  }, [ready, renderButton]);
+  }, [ready, renderButton, cfToken]);
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr(null);
+    if (!cfToken) {
+   setErr("Silakan verifikasi manusia (Cloudflare) terlebih dahulu.");
+   return;
+ }
     const fe = validateLogin({ email, password });
     setFieldErrs(fe);
     if (Object.keys(fe).length) {
@@ -77,7 +93,11 @@ export default function Login({ embedded = false }) {
     }
     setLoading(true);
     try {
-      const res = await apiPost("/api/auth/login", { email, password });
+     const res = await apiPost("/api/auth/login", {
+     email,
+     password,
+     "cf-turnstile-response": cfToken,
+   });
       localStorage.setItem("token", res.token);
       nav("/dashboard");
     } catch (e) {
@@ -283,7 +303,7 @@ export default function Login({ embedded = false }) {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !cfToken}
           className={[
             "group relative w-full overflow-hidden rounded-xl px-4 py-3",
             "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white",
@@ -319,6 +339,7 @@ export default function Login({ embedded = false }) {
             {loading ? "Memproses…" : "Masuk"}
           </span>
         </button>
+       
 
         {/* --- Separator + Google Button --- */}
         <div className="relative my-4">
@@ -349,6 +370,12 @@ export default function Login({ embedded = false }) {
             type="button"
             onClick={() => {
               // cari elemen tombol dari GIS dan trigger click
+              if (!cfToken) {
+                setErr(
+                  "Silakan verifikasi manusia (Cloudflare) terlebih dahulu."
+                );
+                return;
+              }
               const btn =
                 googleBtnRef.current?.querySelector('div[role="button"]') ||
                 googleBtnRef.current?.firstElementChild;
@@ -360,14 +387,17 @@ export default function Login({ embedded = false }) {
                 })
               );
             }}
-            disabled={gLoading || !ready}
+            disabled={gLoading || !ready || !cfToken}
             className={[
               "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3",
               "bg-zinc-900 hover:bg-zinc-800 border border-white/10",
               "text-zinc-100 text-sm transition",
               "shadow-lg shadow-black/20",
               "disabled:opacity-60 disabled:cursor-not-allowed",
-              "focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+              "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3 border text-sm transition shadow-lg",
+              !cfToken || !ready
+                ? "bg-zinc-900/50 border-white/10 text-zinc-400 cursor-not-allowed grayscale"
+                : "bg-zinc-900 hover:bg-zinc-800 border-white/10 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
             ].join(" ")}
           >
             <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
@@ -402,6 +432,12 @@ export default function Login({ embedded = false }) {
               </svg>
             )}
           </button>
+           <div className="my-3 flex justify-center">
+          <TurnstileBox
+            onToken={setCfToken}
+            onExpire={() => setCfToken(null)}
+          />
+        </div>
         </div>
 
         <p className="text-sm text-zinc-400 text-center">

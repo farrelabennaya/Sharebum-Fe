@@ -2,6 +2,9 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiPost } from "../lib/api.js";
+import TurnstileBox from "../components/TurnstileBox.jsx";
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 /* ========= Particle Background (ringan) ========= */
 function ParticleBackground() {
@@ -12,17 +15,16 @@ function ParticleBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    const resize = () => {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
     };
-    resizeCanvas();
+    resize();
 
-    const initParticles = () => {
+    const init = () => {
       particlesRef.current = [];
-      const num = Math.min(50, Math.floor(window.innerWidth / 30));
+      const num = Math.min(50, Math.floor(innerWidth / 30));
       for (let i = 0; i < num; i++) {
         particlesRef.current.push({
           x: Math.random() * canvas.width,
@@ -34,20 +36,19 @@ function ParticleBackground() {
         });
       }
     };
-    initParticles();
+    init();
 
-    const animate = () => {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    const anim = () => {
+      ctx.fillStyle = "rgba(0,0,0,0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       particlesRef.current.forEach((p) => {
         const dx = mouseRef.current.x - p.x;
         const dy = mouseRef.current.y - p.y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const d = Math.hypot(dx, dy) || 1;
         if (d < 100) {
-          const force = (100 - d) / 100;
-          p.vx -= (dx / d) * force * 0.01;
-          p.vy -= (dy / d) * force * 0.01;
+          const f = (100 - d) / 100;
+          p.vx -= (dx / d) * f * 0.01;
+          p.vy -= (dy / d) * f * 0.01;
         }
         p.x += p.vx;
         p.y += p.vy;
@@ -56,38 +57,35 @@ function ParticleBackground() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139, 92, 246, ${p.o})`;
+        ctx.fillStyle = `rgba(139,92,246,${p.o})`;
         ctx.fill();
 
         particlesRef.current.forEach((o) => {
-          const dx2 = p.x - o.x;
-          const dy2 = p.y - o.y;
-          const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          const d2 = Math.hypot(p.x - o.x, p.y - o.y);
           if (d2 < 80) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(o.x, o.y);
-            ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 * (1 - d2 / 80)})`;
+            ctx.strokeStyle = `rgba(139,92,246,${0.1 * (1 - d2 / 80)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         });
       });
-
-      requestAnimationFrame(animate);
+      requestAnimationFrame(anim);
     };
-    animate();
+    anim();
 
     const onMove = (e) => (mouseRef.current = { x: e.clientX, y: e.clientY });
     const onResize = () => {
-      resizeCanvas();
-      initParticles();
+      resize();
+      init();
     };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("resize", onResize);
+    addEventListener("mousemove", onMove);
+    addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("resize", onResize);
+      removeEventListener("mousemove", onMove);
+      removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -100,11 +98,11 @@ function ParticleBackground() {
   );
 }
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
 /* ================= Register ================= */
 export default function Register() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [cfToken, setCfToken] = useState(null); // <- token Turnstile
+  const [gLoading, setGLoading] = useState(false); // <- loading Google
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -115,14 +113,58 @@ export default function Register() {
   const [err, setErr] = useState(null);
   const [fieldErrs, setFieldErrs] = useState({});
   const [busy, setBusy] = useState(false);
-  const [gLoading, setGLoading] = useState(false);
   const nav = useNavigate();
 
   useEffect(() => {
     const onMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", onMouseMove);
-    return () => window.removeEventListener("mousemove", onMouseMove);
+    addEventListener("mousemove", onMouseMove);
+    return () => removeEventListener("mousemove", onMouseMove);
   }, []);
+
+  // Google Identity Services init (DI LUAR onSubmit)
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    const host = document.getElementById("gsi-btn-reg");
+    if (!window.google || !window.google.accounts || !host) return;
+
+    const handleCredentialResponse = async (res) => {
+      try {
+        setErr(null);
+        setGLoading(true);
+        // kirim juga token turnstile ke BE
+        const out = await apiPost("/api/auth/google", {
+          id_token: res.credential,
+          "cf-turnstile-response": cfToken,
+        });
+        localStorage.setItem("token", out.token);
+        nav("/dashboard");
+      } catch (e) {
+        setErr(String(e?.message || "Login Google gagal"));
+      } finally {
+        setGLoading(false);
+      }
+    };
+
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse,
+      ux_mode: "popup",
+    });
+
+    // HANYA render tombol kalau sudah ada cfToken
+    if (cfToken) {
+      window.google.accounts.id.renderButton(host, {
+        theme: "filled_black",
+        size: "large",
+        shape: "pill",
+        text: "continue_with",
+        logo_alignment: "left",
+        width: "100%",
+      });
+    }
+
+    // tidak perlu deps lain; render ulang saat cfToken berubah
+  }, [cfToken]);
 
   // password strength
   const pwd = useMemo(() => {
@@ -144,16 +186,24 @@ export default function Register() {
     return { score: s, label, barClass, width: `${(s / 5) * 100}%` };
   }, [password]);
 
+  const mismatch = password2 && password2 !== password;
+
+  // ===== SUBMIT REGISTER =====
   async function onSubmit(e) {
     e.preventDefault();
     setErr(null);
     setFieldErrs({});
+
     if (!name || !email || !password) {
       setErr("Nama, email, dan password wajib diisi.");
       return;
     }
     if (password !== password2) {
       setErr("Konfirmasi password tidak cocok.");
+      return;
+    }
+    if (!cfToken) {
+      setErr("Verifikasi manusia (Turnstile) dibutuhkan.");
       return;
     }
 
@@ -164,85 +214,27 @@ export default function Register() {
         email,
         password,
         password_confirmation: password2,
+        "cf-turnstile-response": cfToken, // <-- WAJIB dikirim
       });
-
-      if (res?.token) {
-        localStorage.setItem("token", res.token);
-      } else {
-        const login = await apiPost("/api/auth/login", { email, password });
-        localStorage.setItem("token", login.token);
-      }
+      localStorage.setItem("token", res.token);
       nav("/dashboard");
     } catch (e) {
       if (e?.status === 422 && e?.data?.errors) {
         setFieldErrs(e.data.errors || {});
         setErr("Periksa kembali data yang diisi.");
       } else {
-        setErr(String(e?.message || e || "Gagal mendaftar"));
+        setErr(String(e?.message || "Gagal mendaftar"));
       }
     } finally {
       setBusy(false);
+      // token turnstile biasanya sekali pakai — biarkan komponen refresh sendiri
     }
   }
-
-  // === GOOGLE LOGIN (render tombol + callback) ===
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) return;
-    if (
-      !window.google ||
-      !window.google.accounts ||
-      !document.getElementById("gsi-btn-reg")
-    )
-      return;
-
-    const handleCredentialResponse = async (res) => {
-      try {
-        setErr(null);
-        setGLoading(true); // ← start loading
-        const out = await apiPost("/api/auth/google", {
-          id_token: res.credential,
-        });
-        localStorage.setItem("token", out.token);
-        nav("/dashboard");
-      } catch (e) {
-        setErr(String(e?.message || "Login Google gagal"));
-      } finally {
-        setGLoading(false); // ← stop loading
-      }
-    };
-
-    // init GIS
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-      ux_mode: "popup", // aman untuk SPA
-    });
-
-    // render button
-    window.google.accounts.id.renderButton(
-      document.getElementById("gsi-btn-reg"),
-      {
-        theme: "filled_black",
-        size: "large",
-        shape: "pill",
-        text: "continue_with",
-        logo_alignment: "left",
-        width: "100%", // ← dari 310 jadi full-width
-      }
-    );
-
-    // optional: One Tap
-    // window.google.accounts.id.prompt();
-
-    return () => {};
-  }, []);
 
   const FE = ({ name }) =>
     fieldErrs?.[name] ? (
       <p className="text-xs text-red-400 mt-1">{fieldErrs[name][0]}</p>
     ) : null;
-
-  const mismatch = password2 && password2 !== password;
 
   return (
     <div className="relative min-h-svh flex items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black text-white">
@@ -568,10 +560,18 @@ export default function Register() {
             )}
           </div>
 
+          <div className="my-3 flex justify-center">
+            <TurnstileBox
+              onToken={setCfToken}
+              onExpire={() => setCfToken(null)} // penting: reset saat expired
+              className="scale-[.95] origin-center" // opsional styling
+            />
+          </div>
+
           {/* Submit */}
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || !cfToken}
             className={[
               "group relative w-full overflow-hidden rounded-xl px-4 py-3",
               "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white",
@@ -608,7 +608,6 @@ export default function Register() {
             </span>
           </button>
 
-          {/* OR + Google (custom look, same flow) */}
           <div className="relative my-4">
             <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
             <span
@@ -620,77 +619,85 @@ export default function Register() {
             </span>
           </div>
 
+          {/* OR + Google (custom look, same flow) */}
           <div className="relative">
-            {/* 1) Tombol GIS disembunyikan tapi tetap ada (biar fungsinya jalan) */}
+            {/* Button GIS (tak terlihat) */}
             <div
               id="gsi-btn-reg"
-              className={[
-                "absolute inset-0 opacity-0 pointer-events-none",
-                // bikin ukurannya ngikut full:
-                "[&>div]:w-full [&>div>div]:w-full",
-              ].join(" ")}
+              className="absolute inset-0 opacity-0 pointer-events-none [&>div]:w-full [&>div>div]:w-full"
             />
-
-            {/* 2) Tombol custom yang kelihatan (proxy click ke GIS) */}
-            <button
-              type="button"
-              onClick={() => {
-                const host = document.getElementById("gsi-btn-reg");
-                const btn =
-                  host?.querySelector('div[role="button"]') ||
-                  host?.firstElementChild;
-                btn?.dispatchEvent(
-                  new MouseEvent("click", {
-                    bubbles: true,
-                    cancelable: true,
-                    view: window,
-                  })
-                );
-              }}
-              disabled={gLoading}
-              className={[
-                "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3",
-                "bg-zinc-900 hover:bg-zinc-800 border border-white/10",
-                "text-zinc-100 text-sm transition",
-                "shadow-lg shadow-black/20",
-                "focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
-              ].join(" ")}
-            >
-              <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
-                <img
-                  src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
-                  alt=""
-                  className="w-4 h-4"
-                />
-              </span>
-              <span className="font-medium">Lanjutkan dengan Google</span>
-
-              {gLoading && (
-                <svg
-                  className="ml-auto size-4 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden
+            {/* Custom proxy button */}
+            {(() => {
+              const disabledGoogle = !cfToken || gLoading; // <— kunci di sini
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (disabledGoogle) {
+                      setErr(
+                        "Silakan verifikasi manusia (Cloudflare) terlebih dahulu."
+                      );
+                      return;
+                    }
+                    const host = document.getElementById("gsi-btn-reg");
+                    const btn =
+                      host?.querySelector('div[role="button"]') ||
+                      host?.firstElementChild;
+                    btn?.dispatchEvent(
+                      new MouseEvent("click", {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                      })
+                    );
+                  }}
+                  disabled={disabledGoogle}
+                  aria-disabled={disabledGoogle}
+                  title={
+                    disabledGoogle
+                      ? "Verifikasi manusia dulu"
+                      : "Lanjutkan dengan Google"
+                  }
+                  className={[
+                    "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3 border text-sm transition shadow-lg",
+                    disabledGoogle
+                      ? "bg-zinc-900/50 border-white/10 text-zinc-400 cursor-not-allowed grayscale"
+                      : "bg-zinc-900 hover:bg-zinc-800 border-white/10 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+                  ].join(" ")}
                 >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    opacity=".25"
-                  />
-                  <path
-                    d="M4 12a8 8 0 0 1 8-8"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  />
-                </svg>
-              )}
-            </button>
-
-            {/* (Opsional) overlay loading ketika lagi proses */}
-            {/* Kalau kamu punya state loading Google, bisa tambahkan overlay di sini */}
+                  <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
+                    <img
+                      src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
+                      alt=""
+                      className="w-4 h-4"
+                    />
+                  </span>
+                  <span className="font-medium">Lanjutkan dengan Google</span>
+                  {gLoading && (
+                    <svg
+                      className="ml-auto size-4 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        opacity=".25"
+                      />
+                      <path
+                        d="M4 12a8 8 0 0 1 8-8"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      />
+                    </svg>
+                  )}
+                </button>
+              );
+            })()}
           </div>
 
           {/* Footer */}
