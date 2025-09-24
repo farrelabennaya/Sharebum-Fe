@@ -1225,8 +1225,9 @@ export default function LandingPage() {
             <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 items-center gap-3 text-xs text-zinc-400">
               <p>
                 © {new Date().getFullYear()}{" "}
-                <span className="text-zinc-200">ShareBum</span>. Didedikasikan untuk sodara Nopal, agar beliau
-                menjadi lebih semangat lagi menjalani hidup.
+                <span className="text-zinc-200">ShareBum</span>. Didedikasikan
+                untuk sodara Nopal, agar beliau menjadi lebih semangat lagi
+                menjalani hidup.
               </p>
               <div className="md:justify-self-end flex items-center gap-3">
                 <a href="#" className="hover:text-zinc-300 transition-colors">
@@ -1243,6 +1244,20 @@ export default function LandingPage() {
       </main>
 
       <FloatingActions />
+      {/* Floating "Kembali ke Dashboard" — hanya muncul kalau sudah login */}
+      {hasToken && (
+        <div className="fixed top-0 left-0 right-0 z-40">
+          <div className="mx-auto mt-3 w-fit rounded-full border border-white/10 bg-white/5 backdrop-blur px-4 py-1.5 text-xs text-zinc-200 shadow">
+            Kamu sudah login •{" "}
+            <Link
+              to="/dashboard"
+              className="text-white underline underline-offset-4 hover:opacity-90"
+            >
+              Buka Dashboard
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 

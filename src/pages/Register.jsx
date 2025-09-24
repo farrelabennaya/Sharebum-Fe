@@ -132,10 +132,12 @@ export default function Register() {
         setErr(null);
         setGLoading(true);
         // kirim juga token turnstile ke BE
-        const out = await apiPost("/api/auth/google", {
-          id_token: res.credential,
-          "cf-turnstile-response": cfToken,
-        });
+        const out = await apiPost(
+          "/api/auth/google",
+          { id_token: res.credential, "cf-turnstile-response": cfToken },
+          { allow401: true, noAuth: true }
+        );
+
         localStorage.setItem("token", out.token);
         nav("/dashboard");
       } catch (e) {
@@ -209,13 +211,17 @@ export default function Register() {
 
     setBusy(true);
     try {
-      const res = await apiPost("/api/auth/register", {
-        name,
-        email,
-        password,
-        password_confirmation: password2,
-        "cf-turnstile-response": cfToken, // <-- WAJIB dikirim
-      });
+      const res = await apiPost(
+        "/api/auth/register",
+        {
+          name,
+          email,
+          password,
+          password_confirmation: password2,
+          "cf-turnstile-response": cfToken,
+        },
+        { allow401: true, noAuth: true } // <-- perbaikan penting
+      );
       localStorage.setItem("token", res.token);
       nav("/dashboard");
     } catch (e) {
@@ -560,14 +566,6 @@ export default function Register() {
             )}
           </div>
 
-          <div className="my-3 flex justify-center">
-            <TurnstileBox
-              onToken={setCfToken}
-              onExpire={() => setCfToken(null)} // penting: reset saat expired
-              className="scale-[.95] origin-center" // opsional styling
-            />
-          </div>
-
           {/* Submit */}
           <button
             type="submit"
@@ -698,6 +696,13 @@ export default function Register() {
                 </button>
               );
             })()}
+            <div className="my-3 flex justify-center">
+              <TurnstileBox
+                onToken={setCfToken}
+                onExpire={() => setCfToken(null)} // penting: reset saat expired
+                className="scale-[.95] origin-center" // opsional styling
+              />
+            </div>
           </div>
 
           {/* Footer */}

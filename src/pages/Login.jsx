@@ -23,46 +23,48 @@ export default function Login({ embedded = false }) {
   const [fieldErrs, setFieldErrs] = useState({});
   const [loading, setLoading] = useState(false);
   const [gLoading, setGLoading] = useState(false);
-  const [cfToken, setCfToken] = useState(null); // token 
+  const [cfToken, setCfToken] = useState(null); // token
   const cfRef = useRef(null);
-useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
+  useEffect(() => {
+    cfRef.current = cfToken;
+  }, [cfToken]);
   const nav = useNavigate();
 
   // === GOOGLE LOGIN SETUP ===
   const googleBtnRef = useRef(null);
   const { ready, renderButton } = useGoogleId({
-  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-  onCredential: async (idToken) => {
-    // pakai nilai terbaru dari ref, bukan cfToken (yang bisa stale)
-    if (!cfRef.current) {
-      setErr("Silakan verifikasi manusia terlebih dahulu.");
-      return;
-    }
-    setErr(null);
-    setGLoading(true);
-    try {
-      const res = await apiPost("/api/auth/google", {
-        id_token: idToken,
-        "cf-turnstile-response": cfRef.current, // <<< penting
-      });
-      if (res?.token) {
-        localStorage.setItem("token", res.token);
-        nav("/dashboard");
-      } else {
-        throw new Error("Login Google gagal: token tidak ditemukan.");
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    onCredential: async (idToken) => {
+      // pakai nilai terbaru dari ref, bukan cfToken (yang bisa stale)
+      if (!cfRef.current) {
+        setErr("Silakan verifikasi manusia terlebih dahulu.");
+        return;
       }
-    } catch (e) {
-      setErr(
-        e?.status === 401
-          ? "Login Google ditolak."
-          : String(e?.message || "Gagal login Google")
-      );
-    } finally {
-      setGLoading(false);
-    }
-  },
-});
-
+      setErr(null);
+      setGLoading(true);
+      try {
+        const res = await apiPost(
+          "/api/auth/google",
+          { id_token: idToken, "cf-turnstile-response": cfRef.current },
+          { allow401: true, noAuth: true } // <-- tambah ini
+        );
+        if (res?.token) {
+          localStorage.setItem("token", res.token);
+          nav("/dashboard");
+        } else {
+          throw new Error("Login Google gagal: token tidak ditemukan.");
+        }
+      } catch (e) {
+        setErr(
+          e?.status === 401
+            ? "Login Google ditolak."
+            : String(e?.message || "Gagal login Google")
+        );
+      } finally {
+        setGLoading(false);
+      }
+    },
+  });
 
   useEffect(() => {
     if (ready && cfToken && googleBtnRef.current) {
@@ -82,9 +84,9 @@ useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
     e.preventDefault();
     setErr(null);
     if (!cfToken) {
-   setErr("Silakan verifikasi manusia (Cloudflare) terlebih dahulu.");
-   return;
- }
+      setErr("Silakan verifikasi manusia (Cloudflare) terlebih dahulu.");
+      return;
+    }
     const fe = validateLogin({ email, password });
     setFieldErrs(fe);
     if (Object.keys(fe).length) {
@@ -93,11 +95,11 @@ useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
     }
     setLoading(true);
     try {
-     const res = await apiPost("/api/auth/login", {
-     email,
-     password,
-     "cf-turnstile-response": cfToken,
-   });
+      const res = await apiPost(
+        "/api/auth/login",
+        { email, password, "cf-turnstile-response": cfToken },
+        { allow401: true, noAuth: true } // <-- penting
+      );
       localStorage.setItem("token", res.token);
       nav("/dashboard");
     } catch (e) {
@@ -339,7 +341,6 @@ useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
             {loading ? "Memproses…" : "Masuk"}
           </span>
         </button>
-       
 
         {/* --- Separator + Google Button --- */}
         <div className="relative my-4">
@@ -432,12 +433,13 @@ useEffect(() => { cfRef.current = cfToken; }, [cfToken]);
               </svg>
             )}
           </button>
-           <div className="my-3 flex justify-center">
-          <TurnstileBox
-            onToken={setCfToken}
-            onExpire={() => setCfToken(null)}
-          />
-        </div>
+          <div className="my-3 flex justify-center">
+            <TurnstileBox
+              onToken={setCfToken}
+              onExpire={() => setCfToken(null)} // penting: reset saat expired
+              className="scale-[.95] origin-center" // opsional styling
+            />
+          </div>
         </div>
 
         <p className="text-sm text-zinc-400 text-center">
