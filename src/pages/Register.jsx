@@ -282,7 +282,7 @@ export default function Register() {
       <div className="relative z-10 mx-4 w-full max-w-md rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-black/40">
         <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10" />
 
-        <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-6">
+        <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-4">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold tracking-tight">Buat Akun</h1>
             <p className="text-sm text-zinc-300/80">

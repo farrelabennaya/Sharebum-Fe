@@ -121,7 +121,7 @@ export default function Login({ embedded = false }) {
         "shadow-2xl shadow-black/40",
       ].join(" ")}
     >
-      <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-6" noValidate>
+      <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-4" noValidate>
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-white">
             Masuk
