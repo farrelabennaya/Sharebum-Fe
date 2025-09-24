@@ -115,6 +115,7 @@ export default function Register() {
   const [err, setErr] = useState(null);
   const [fieldErrs, setFieldErrs] = useState({});
   const [busy, setBusy] = useState(false);
+  const [gLoading, setGLoading] = useState(false);
   const nav = useNavigate();
 
   useEffect(() => {
@@ -187,16 +188,26 @@ export default function Register() {
   // === GOOGLE LOGIN (render tombol + callback) ===
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID) return;
-    if (!window.google || !window.google.accounts || !document.getElementById("gsi-btn-reg")) return;
+    if (
+      !window.google ||
+      !window.google.accounts ||
+      !document.getElementById("gsi-btn-reg")
+    )
+      return;
 
     const handleCredentialResponse = async (res) => {
-      // res.credential = id_token
       try {
-        const out = await apiPost("/api/auth/google", { id_token: res.credential });
+        setErr(null);
+        setGLoading(true); // ← start loading
+        const out = await apiPost("/api/auth/google", {
+          id_token: res.credential,
+        });
         localStorage.setItem("token", out.token);
         nav("/dashboard");
       } catch (e) {
         setErr(String(e?.message || "Login Google gagal"));
+      } finally {
+        setGLoading(false); // ← stop loading
       }
     };
 
@@ -208,14 +219,17 @@ export default function Register() {
     });
 
     // render button
-    window.google.accounts.id.renderButton(document.getElementById("gsi-btn-reg"), {
-      theme: "filled_black",
-      size: "large",
-      shape: "pill",
-      text: "continue_with",
-      logo_alignment: "left",
-      width: 310,
-    });
+    window.google.accounts.id.renderButton(
+      document.getElementById("gsi-btn-reg"),
+      {
+        theme: "filled_black",
+        size: "large",
+        shape: "pill",
+        text: "continue_with",
+        logo_alignment: "left",
+        width: "100%", // ← dari 310 jadi full-width
+      }
+    );
 
     // optional: One Tap
     // window.google.accounts.id.prompt();
@@ -314,8 +328,18 @@ export default function Register() {
               ].join(" ")}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="1.5" />
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M4 20a8 8 0 0 1 16 0"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
               </svg>
             </span>
             <label
@@ -360,8 +384,16 @@ export default function Register() {
               ].join(" ")}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 6h16v12H4z" stroke="currentColor" strokeWidth="1.5" />
-                <path d="m4 7 8 6 8-6" stroke="currentColor" strokeWidth="1.5" />
+                <path
+                  d="M4 6h16v12H4z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="m4 7 8 6 8-6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
               </svg>
             </span>
             <label
@@ -409,8 +441,20 @@ export default function Register() {
                 ].join(" ")}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.5" />
+                  <rect
+                    x="5"
+                    y="11"
+                    width="14"
+                    height="9"
+                    rx="2"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 11V8a4 4 0 0 1 8 0v3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
               </span>
               <label
@@ -433,7 +477,9 @@ export default function Register() {
                   "top-[0.8rem] transition-all duration-200",
                   "peer-focus:top-[1.05rem] peer-[&:not(:placeholder-shown)]:top-[1.05rem]",
                 ].join(" ")}
-                aria-label={showPass ? "Sembunyikan password" : "Tampilkan password"}
+                aria-label={
+                  showPass ? "Sembunyikan password" : "Tampilkan password"
+                }
               >
                 {showPass ? "Hide" : "Show"}
               </button>
@@ -450,7 +496,9 @@ export default function Register() {
               </div>
               <p className="mt-1 text-xs text-zinc-400">
                 Kekuatan: <span className="text-zinc-200">{pwd.label}</span>
-                <span className="ml-1 text-zinc-500">({password.length || 0} karakter)</span>
+                <span className="ml-1 text-zinc-500">
+                  ({password.length || 0} karakter)
+                </span>
               </p>
             </div>
           </div>
@@ -467,7 +515,9 @@ export default function Register() {
                 "peer w-full rounded-xl bg-white/5 pl-10 pr-14 text-white placeholder-transparent",
                 "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
                 "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
-                mismatch ? "ring-1 ring-amber-500/40" : "focus:ring-1 focus:ring-violet-400/30",
+                mismatch
+                  ? "ring-1 ring-amber-500/40"
+                  : "focus:ring-1 focus:ring-violet-400/30",
               ].join(" ")}
               autoComplete="new-password"
               aria-invalid={mismatch}
@@ -480,7 +530,13 @@ export default function Register() {
               ].join(" ")}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M20 7 9 18l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M20 7 9 18l-5-5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </span>
             <label
@@ -499,11 +555,17 @@ export default function Register() {
               type="button"
               onClick={() => setShowPass2((v) => !v)}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition"
-              aria-label={showPass2 ? "Sembunyikan konfirmasi" : "Tampilkan konfirmasi"}
+              aria-label={
+                showPass2 ? "Sembunyikan konfirmasi" : "Tampilkan konfirmasi"
+              }
             >
               {showPass2 ? "Hide" : "Show"}
             </button>
-            {mismatch && <p className="text-xs text-amber-300 mt-1">Konfirmasi password belum sama.</p>}
+            {mismatch && (
+              <p className="text-xs text-amber-300 mt-1">
+                Konfirmasi password belum sama.
+              </p>
+            )}
           </div>
 
           {/* Submit */}
@@ -521,29 +583,123 @@ export default function Register() {
             <span className="pointer-events-none absolute inset-0 translate-y-[-100%] bg-gradient-to-b from-white/20 to-transparent opacity-0 transition group-hover:opacity-100 group-hover:translate-y-0" />
             <span className="inline-flex items-center justify-center gap-2 font-medium">
               {busy && (
-                <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
-                  <path className="opacity-75" d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" strokeWidth="3"></path>
+                <svg
+                  className="size-4 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    d="M4 12a8 8 0 0 1 8-8"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  ></path>
                 </svg>
               )}
               {busy ? "Mendaftar…" : "Daftar"}
             </span>
           </button>
 
-          {/* OR + Google Button */}
-          <div className="my-2 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs text-zinc-400">atau</span>
-            <div className="h-px flex-1 bg-white/10" />
+          {/* OR + Google (custom look, same flow) */}
+          <div className="relative my-4">
+            <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            <span
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                   rounded-full border border-white/10 bg-zinc-900/70 px-3 py-1
+                   text-[11px] font-medium text-zinc-300 backdrop-blur"
+            >
+              atau
+            </span>
           </div>
-          <div className="flex justify-center">
-            <div id="gsi-btn-reg" />
+
+          <div className="relative">
+            {/* 1) Tombol GIS disembunyikan tapi tetap ada (biar fungsinya jalan) */}
+            <div
+              id="gsi-btn-reg"
+              className={[
+                "absolute inset-0 opacity-0 pointer-events-none",
+                // bikin ukurannya ngikut full:
+                "[&>div]:w-full [&>div>div]:w-full",
+              ].join(" ")}
+            />
+
+            {/* 2) Tombol custom yang kelihatan (proxy click ke GIS) */}
+            <button
+              type="button"
+              onClick={() => {
+                const host = document.getElementById("gsi-btn-reg");
+                const btn =
+                  host?.querySelector('div[role="button"]') ||
+                  host?.firstElementChild;
+                btn?.dispatchEvent(
+                  new MouseEvent("click", {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window,
+                  })
+                );
+              }}
+              disabled={gLoading}
+              className={[
+                "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3",
+                "bg-zinc-900 hover:bg-zinc-800 border border-white/10",
+                "text-zinc-100 text-sm transition",
+                "shadow-lg shadow-black/20",
+                "focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+              ].join(" ")}
+            >
+              <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
+                <img
+                  src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
+                  alt=""
+                  className="w-4 h-4"
+                />
+              </span>
+              <span className="font-medium">Lanjutkan dengan Google</span>
+
+              {gLoading && (
+                <svg
+                  className="ml-auto size-4 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    opacity=".25"
+                  />
+                  <path
+                    d="M4 12a8 8 0 0 1 8-8"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* (Opsional) overlay loading ketika lagi proses */}
+            {/* Kalau kamu punya state loading Google, bisa tambahkan overlay di sini */}
           </div>
 
           {/* Footer */}
           <p className="text-sm text-zinc-400 text-center">
             Sudah punya akun?{" "}
-            <Link to="/" className="text-white underline underline-offset-4 hover:opacity-90">
+            <Link
+              to="/"
+              className="text-white underline underline-offset-4 hover:opacity-90"
+            >
               Masuk di sini
             </Link>
           </p>

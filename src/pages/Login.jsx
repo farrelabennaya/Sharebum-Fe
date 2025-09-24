@@ -56,10 +56,12 @@ export default function Login({ embedded = false }) {
   useEffect(() => {
     if (ready && googleBtnRef.current) {
       renderButton(googleBtnRef.current, {
-        theme: "filled_black", // biar match UI
+        theme: "filled_black",
         size: "large",
         shape: "pill",
-        width: 310, // atau biarkan auto
+        text: "signin_with",
+        logo_alignment: "left",
+        width: "100%", // penting biar area klik/DOM pas
       });
     }
   }, [ready, renderButton]);
@@ -149,8 +151,16 @@ export default function Login({ embedded = false }) {
               ].join(" ")}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 6h16v12H4z" stroke="currentColor" strokeWidth="1.5" />
-                <path d="m4 7 8 6 8-6" stroke="currentColor" strokeWidth="1.5" />
+                <path
+                  d="M4 6h16v12H4z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="m4 7 8 6 8-6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
               </svg>
             </span>
             <label
@@ -240,7 +250,9 @@ export default function Login({ embedded = false }) {
               type="button"
               onClick={() => setShowPass((v) => !v)}
               className="absolute right-2 top-[0.8rem] transition-all duration-200 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 peer-focus:top-[1.05rem] peer-[&:not(:placeholder-shown)]:top-[1.05rem]"
-              aria-label={showPass ? "Sembunyikan password" : "Tampilkan password"}
+              aria-label={
+                showPass ? "Sembunyikan password" : "Tampilkan password"
+              }
             >
               {showPass ? "Hide" : "Show"}
             </button>
@@ -255,10 +267,16 @@ export default function Login({ embedded = false }) {
         {/* Options + Submit */}
         <div className="flex items-center justify-between text-sm">
           <label className="inline-flex items-center gap-2 select-none text-zinc-300">
-            <input type="checkbox" className="size-4 rounded border-white/20 bg-white/5" />
+            <input
+              type="checkbox"
+              className="size-4 rounded border-white/20 bg-white/5"
+            />
             Ingat saya
           </label>
-          <Link to="/forgot" className="text-zinc-300 hover:text-white underline underline-offset-4">
+          <Link
+            to="/forgot"
+            className="text-zinc-300 hover:text-white underline underline-offset-4"
+          >
             Lupa password?
           </Link>
         </div>
@@ -277,9 +295,25 @@ export default function Login({ embedded = false }) {
           <span className="pointer-events-none absolute inset-0 translate-y-[-100%] bg-gradient-to-b from-white/20 to-transparent opacity-0 transition group-hover:opacity-100 group-hover:translate-y-0" />
           <span className="inline-flex items-center justify-center gap-2 font-medium">
             {loading && (
-              <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
-                <path className="opacity-75" d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" strokeWidth="3"></path>
+              <svg
+                className="size-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  d="M4 12a8 8 0 0 1 8-8"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                ></path>
               </svg>
             )}
             {loading ? "Memproses…" : "Masuk"}
@@ -287,23 +321,95 @@ export default function Login({ embedded = false }) {
         </button>
 
         {/* --- Separator + Google Button --- */}
-        <div className="relative">
-          <div className="my-2 h-px bg-white/10" />
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white/5 px-2 text-xs text-zinc-400">
+        <div className="relative my-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+          <span
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                   rounded-full border border-white/10 bg-zinc-900/70 px-3 py-1
+                   text-[11px] font-medium text-zinc-300 backdrop-blur"
+          >
             atau
-          </div>
+          </span>
         </div>
 
-        <div className="flex flex-col items-center gap-3">
-          <div ref={googleBtnRef} className="w-full flex justify-center" />
-          {gLoading && (
-            <div className="text-xs text-zinc-400">Memproses login Google…</div>
-          )}
+        {/* Wrapper relatif: simpan tombol GIS tak terlihat + tombol custom terlihat */}
+        <div className="relative">
+          {/* 1) Tombol GIS (ID token) disembunyikan tapi tetap ada di DOM */}
+          <div
+            ref={googleBtnRef}
+            className={[
+              "absolute inset-0 opacity-0 pointer-events-none",
+              // pastikan ukurannya full biar area kliknya sinkron kalau dibutuhkan
+              "[&>div]:w-full [&>div>div]:w-full",
+            ].join(" ")}
+          />
+
+          {/* 2) Tombol custom yang tampil — klik ini memicu klik tombol GIS */}
+          <button
+            type="button"
+            onClick={() => {
+              // cari elemen tombol dari GIS dan trigger click
+              const btn =
+                googleBtnRef.current?.querySelector('div[role="button"]') ||
+                googleBtnRef.current?.firstElementChild;
+              btn?.dispatchEvent(
+                new MouseEvent("click", {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window,
+                })
+              );
+            }}
+            disabled={gLoading || !ready}
+            className={[
+              "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3",
+              "bg-zinc-900 hover:bg-zinc-800 border border-white/10",
+              "text-zinc-100 text-sm transition",
+              "shadow-lg shadow-black/20",
+              "disabled:opacity-60 disabled:cursor-not-allowed",
+              "focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+            ].join(" ")}
+          >
+            <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
+              <img
+                src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
+                alt=""
+                className="w-4 h-4"
+              />
+            </span>
+            <span className="font-medium">Login dengan Google</span>
+
+            {gLoading && (
+              <svg
+                className="ml-auto size-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  opacity=".25"
+                />
+                <path
+                  d="M4 12a8 8 0 0 1 8-8"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                />
+              </svg>
+            )}
+          </button>
         </div>
 
         <p className="text-sm text-zinc-400 text-center">
           Belum punya akun?{" "}
-          <Link to="/register" className="text-white underline underline-offset-4 hover:opacity-90">
+          <Link
+            to="/register"
+            className="text-white underline underline-offset-4 hover:opacity-90"
+          >
             Bikin di sini
           </Link>
         </p>
@@ -315,7 +421,10 @@ export default function Login({ embedded = false }) {
 
   return (
     <div className="relative min-h-svh flex items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">
-      <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+      >
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-violet-500/20 blur-3xl animate-pulse" />
         <div className="absolute -bottom-48 -right-32 w-[28rem] h-[28rem] rounded-full bg-fuchsia-500/15 blur-3xl animate-pulse delay-1000" />
       </div>
