@@ -13,12 +13,15 @@ import LoginSolo from "./pages/LoginSolo.jsx";
 import AlbumSettings from "./pages/AlbumSettings.jsx";
 import Profile from "./pages/Profile.jsx";
 import Settings from "./pages/Settings.jsx";
+import Verified from "./pages/Verified.jsx";
 
 const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> }, // ⬅️ rute publik
   { path: "/", element: <LandingPage /> }, // ⬅️ rute publik
   { path: "/loginsolo", element: <LoginSolo /> }, // ⬅️ rute publik
+ { path: "/verified", element: <Verified />},
+
   // semua child di bawah RequireAuth butuh login
   {
     element: <RequireAuth />,
