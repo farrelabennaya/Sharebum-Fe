@@ -113,6 +113,7 @@ export default function Register() {
   const [err, setErr] = useState(null);
   const [fieldErrs, setFieldErrs] = useState({});
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState("form");
   const nav = useNavigate();
 
   useEffect(() => {
@@ -211,7 +212,7 @@ export default function Register() {
 
     setBusy(true);
     try {
-      const res = await apiPost(
+      await apiPost(
         "/api/auth/register",
         {
           name,
@@ -220,10 +221,10 @@ export default function Register() {
           password_confirmation: password2,
           "cf-turnstile-response": cfToken,
         },
-        { allow401: true, noAuth: true } // <-- perbaikan penting
+        { allow401: true, noAuth: true }
       );
-      localStorage.setItem("token", res.token);
-      nav("/dashboard");
+      // Sukses daftar → TIDAK simpan token. Tampilkan instruksi cek email.
+      setStep("sent");
     } catch (e) {
       if (e?.status === 422 && e?.data?.errors) {
         setFieldErrs(e.data.errors || {});
@@ -233,7 +234,6 @@ export default function Register() {
       }
     } finally {
       setBusy(false);
-      // token turnstile biasanya sekali pakai — biarkan komponen refresh sendiri
     }
   }
 
@@ -281,440 +281,524 @@ export default function Register() {
 
       <div className="relative z-10 mx-4 w-full max-w-md rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-black/40">
         <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10" />
-
-        <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-4">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Buat Akun</h1>
-            <p className="text-sm text-zinc-300/80">
-              Yuk gabung. Share Share album kita.
+        {/* {step === "sent" ? (
+          <div className="text-center space-y-3">
+            <h2 className="text-xl font-semibold">Cek email kamu</h2>
+            <p className="text-sm text-zinc-300">
+              Kami mengirim tautan verifikasi ke{" "}
+              <span className="text-white font-medium">{email}</span>. Buka link
+              tersebut untuk mengaktifkan akun.
             </p>
-          </div>
-
-          {err && (
-            <div
-              className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
-              aria-live="polite"
-            >
-              {err}
-            </div>
-          )}
-
-          {/* Nama */}
-          <div className="relative">
-            <input
-              id="name"
-              type="text"
-              placeholder=" "
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={[
-                "peer w-full rounded-xl bg-white/5 pl-10 pr-3 text-white placeholder-transparent",
-                "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
-                "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
-                fieldErrs?.name
-                  ? "ring-1 ring-red-500/40"
-                  : "focus:ring-1 focus:ring-violet-400/30",
-              ].join(" ")}
-              autoComplete="name"
-              aria-invalid={!!fieldErrs?.name}
-            />
-            <span
-              className={[
-                "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
-                "top-[0.9rem] transition-all duration-200",
-                "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
-              ].join(" ")}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle
-                  cx="12"
-                  cy="8"
-                  r="4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M4 20a8 8 0 0 1 16 0"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-            </span>
-            <label
-              htmlFor="name"
-              className={[
-                "pointer-events-none absolute left-10 transition-all duration-200",
-                "top-2 -translate-y-0 text-xs text-zinc-300",
-                "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
-                "peer-focus:top-2 peer-focus:-translate-y-0",
-                "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
-              ].join(" ")}
-            >
-              Nama
-            </label>
-            <FE name="name" />
-          </div>
-
-          {/* Email */}
-          <div className="relative">
-            <input
-              id="email"
-              type="email"
-              placeholder=" "
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={[
-                "peer w-full rounded-xl bg-white/5 pl-10 pr-3 text-white placeholder-transparent",
-                "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
-                "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
-                fieldErrs?.email
-                  ? "ring-1 ring-red-500/40"
-                  : "focus:ring-1 focus:ring-violet-400/30",
-              ].join(" ")}
-              autoComplete="email"
-              aria-invalid={!!fieldErrs?.email}
-            />
-            <span
-              className={[
-                "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
-                "top-[0.9rem] transition-all duration-200",
-                "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
-              ].join(" ")}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 6h16v12H4z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="m4 7 8 6 8-6"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-            </span>
-            <label
-              htmlFor="email"
-              className={[
-                "pointer-events-none absolute left-10 transition-all duration-200",
-                "top-2 -translate-y-0 text-xs text-zinc-300",
-                "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
-                "peer-focus:top-2 peer-focus:-translate-y-0",
-                "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
-              ].join(" ")}
-            >
-              Email
-            </label>
-            <FE name="email" />
-          </div>
-
-          {/* Password */}
-          <div className="space-y-2">
-            <div className="relative">
-              <input
-                id="password"
-                type={showPass ? "text" : "password"}
-                placeholder=" "
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={[
-                  "peer w-full rounded-xl bg-white/5 pl-10 pr-16",
-                  "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
-                  "text-white placeholder-transparent",
-                  "border border-white/10 focus:border-violet-400/40",
-                  "outline-none transition-all duration-200",
-                  fieldErrs?.password
-                    ? "ring-1 ring-red-500/40"
-                    : "focus:ring-1 focus:ring-violet-400/30",
-                ].join(" ")}
-                autoComplete="new-password"
-                aria-invalid={!!fieldErrs?.password}
-              />
-              <span
-                className={[
-                  "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
-                  "top-[0.9rem] transition-all duration-200",
-                  "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
-                ].join(" ")}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <rect
-                    x="5"
-                    y="11"
-                    width="14"
-                    height="9"
-                    rx="2"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M8 11V8a4 4 0 0 1 8 0v3"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </span>
-              <label
-                htmlFor="password"
-                className={[
-                  "pointer-events-none absolute left-10 transition-all duration-200",
-                  "top-2 -translate-y-0 text-xs text-zinc-300",
-                  "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
-                  "peer-focus:top-2 peer-focus:-translate-y-0",
-                  "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
-                ].join(" ")}
-              >
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPass((v) => !v)}
-                className={[
-                  "absolute right-2 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition",
-                  "top-[0.8rem] transition-all duration-200",
-                  "peer-focus:top-[1.05rem] peer-[&:not(:placeholder-shown)]:top-[1.05rem]",
-                ].join(" ")}
-                aria-label={
-                  showPass ? "Sembunyikan password" : "Tampilkan password"
-                }
-              >
-                {showPass ? "Hide" : "Show"}
-              </button>
-            </div>
-
-            <FE name="password" />
-
-            <div className="mt-1">
-              <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r ${pwd.barClass} transition-all duration-300`}
-                  style={{ width: pwd.width }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-zinc-400">
-                Kekuatan: <span className="text-zinc-200">{pwd.label}</span>
-                <span className="ml-1 text-zinc-500">
-                  ({password.length || 0} karakter)
-                </span>
-              </p>
-            </div>
-          </div>
-
-          {/* Konfirmasi Password */}
-          <div className="relative">
-            <input
-              id="password2"
-              type={showPass2 ? "text" : "password"}
-              placeholder=" "
-              value={password2}
-              onChange={(e) => setPassword2(e.target.value)}
-              className={[
-                "peer w-full rounded-xl bg-white/5 pl-10 pr-14 text-white placeholder-transparent",
-                "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
-                "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
-                mismatch
-                  ? "ring-1 ring-amber-500/40"
-                  : "focus:ring-1 focus:ring-violet-400/30",
-              ].join(" ")}
-              autoComplete="new-password"
-              aria-invalid={mismatch}
-            />
-            <span
-              className={[
-                "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
-                "top-[0.9rem] transition-all duration-200",
-                "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
-              ].join(" ")}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M20 7 9 18l-5-5"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            <label
-              htmlFor="password2"
-              className={[
-                "pointer-events-none absolute left-10 transition-all duration-200",
-                "top-2 -translate-y-0 text-xs text-zinc-300",
-                "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
-                "peer-focus:top-2 peer-focus:-translate-y-0",
-                "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
-              ].join(" ")}
-            >
-              Konfirmasi Password
-            </label>
             <button
               type="button"
-              onClick={() => setShowPass2((v) => !v)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition"
-              aria-label={
-                showPass2 ? "Sembunyikan konfirmasi" : "Tampilkan konfirmasi"
-              }
+              onClick={async () => {
+                try {
+                  await apiPost(
+                    "/api/email/verification-notification",
+                    { email },
+                    { noAuth: true }
+                  );
+                  setErr(null);
+                } catch (e) {
+                  setErr(String(e?.message || "Gagal mengirim ulang."));
+                }
+              }}
+              className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-sm"
             >
-              {showPass2 ? "Hide" : "Show"}
+              Kirim ulang tautan
             </button>
-            {mismatch && (
-              <p className="text-xs text-amber-300 mt-1">
-                Konfirmasi password belum sama.
-              </p>
-            )}
           </div>
+         ) : ( */}
+        <form onSubmit={onSubmit} className="p-6 md:p-8 space-y-4">
+          {step === "form" ? (
+            <>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Buat Akun
+                </h1>
+                <p className="text-sm text-zinc-300/80">
+                  Yuk gabung. Share Share album kita.
+                </p>
+              </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={busy || !cfToken}
-            className={[
-              "group relative w-full overflow-hidden rounded-xl px-4 py-3",
-              "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white",
-              "shadow-lg shadow-fuchsia-900/30",
-              "transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]",
-              "disabled:opacity-60 disabled:cursor-not-allowed",
-            ].join(" ")}
-          >
-            <span className="pointer-events-none absolute inset-0 translate-y-[-100%] bg-gradient-to-b from-white/20 to-transparent opacity-0 transition group-hover:opacity-100 group-hover:translate-y-0" />
-            <span className="inline-flex items-center justify-center gap-2 font-medium">
-              {busy && (
-                <svg
-                  className="size-4 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
+              {err && (
+                <div
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+                  aria-live="polite"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    d="M4 12a8 8 0 0 1 8-8"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  ></path>
-                </svg>
+                  {err}
+                </div>
               )}
-              {busy ? "Mendaftar…" : "Daftar"}
-            </span>
-          </button>
 
-          <div className="relative my-4">
-            <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            <span
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                   rounded-full border border-white/10 bg-zinc-900/70 px-3 py-1
-                   text-[11px] font-medium text-zinc-300 backdrop-blur"
-            >
-              atau
-            </span>
-          </div>
-
-          {/* OR + Google (custom look, same flow) */}
-          <div className="relative">
-            {/* Button GIS (tak terlihat) */}
-            <div
-              id="gsi-btn-reg"
-              className="absolute inset-0 opacity-0 pointer-events-none [&>div]:w-full [&>div>div]:w-full"
-            />
-            {/* Custom proxy button */}
-            {(() => {
-              const disabledGoogle = !cfToken || gLoading; // <— kunci di sini
-              return (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (disabledGoogle) {
-                      setErr(
-                        "Silakan verifikasi manusia (Cloudflare) terlebih dahulu."
-                      );
-                      return;
-                    }
-                    const host = document.getElementById("gsi-btn-reg");
-                    const btn =
-                      host?.querySelector('div[role="button"]') ||
-                      host?.firstElementChild;
-                    btn?.dispatchEvent(
-                      new MouseEvent("click", {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window,
-                      })
-                    );
-                  }}
-                  disabled={disabledGoogle}
-                  aria-disabled={disabledGoogle}
-                  title={
-                    disabledGoogle
-                      ? "Verifikasi manusia dulu"
-                      : "Lanjutkan dengan Google"
-                  }
+              {/* Nama */}
+              <div className="relative">
+                <input
+                  id="name"
+                  type="text"
+                  placeholder=" "
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className={[
-                    "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3 border text-sm transition shadow-lg",
-                    disabledGoogle
-                      ? "bg-zinc-900/50 border-white/10 text-zinc-400 cursor-not-allowed grayscale"
-                      : "bg-zinc-900 hover:bg-zinc-800 border-white/10 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+                    "peer w-full rounded-xl bg-white/5 pl-10 pr-3 text-white placeholder-transparent",
+                    "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
+                    "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
+                    fieldErrs?.name
+                      ? "ring-1 ring-red-500/40"
+                      : "focus:ring-1 focus:ring-violet-400/30",
+                  ].join(" ")}
+                  autoComplete="name"
+                  aria-invalid={!!fieldErrs?.name}
+                />
+                <span
+                  className={[
+                    "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
+                    "top-[0.9rem] transition-all duration-200",
+                    "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
                   ].join(" ")}
                 >
-                  <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
-                    <img
-                      src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
-                      alt=""
-                      className="w-4 h-4"
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="8"
+                      r="4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
                     />
+                    <path
+                      d="M4 20a8 8 0 0 1 16 0"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </span>
+                <label
+                  htmlFor="name"
+                  className={[
+                    "pointer-events-none absolute left-10 transition-all duration-200",
+                    "top-2 -translate-y-0 text-xs text-zinc-300",
+                    "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
+                    "peer-focus:top-2 peer-focus:-translate-y-0",
+                    "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
+                  ].join(" ")}
+                >
+                  Nama
+                </label>
+                <FE name="name" />
+              </div>
+
+              {/* Email */}
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  placeholder=" "
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={[
+                    "peer w-full rounded-xl bg-white/5 pl-10 pr-3 text-white placeholder-transparent",
+                    "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
+                    "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
+                    fieldErrs?.email
+                      ? "ring-1 ring-red-500/40"
+                      : "focus:ring-1 focus:ring-violet-400/30",
+                  ].join(" ")}
+                  autoComplete="email"
+                  aria-invalid={!!fieldErrs?.email}
+                />
+                <span
+                  className={[
+                    "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
+                    "top-[0.9rem] transition-all duration-200",
+                    "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
+                  ].join(" ")}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M4 6h16v12H4z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="m4 7 8 6 8-6"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </span>
+                <label
+                  htmlFor="email"
+                  className={[
+                    "pointer-events-none absolute left-10 transition-all duration-200",
+                    "top-2 -translate-y-0 text-xs text-zinc-300",
+                    "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
+                    "peer-focus:top-2 peer-focus:-translate-y-0",
+                    "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
+                  ].join(" ")}
+                >
+                  Email
+                </label>
+                <FE name="email" />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPass ? "text" : "password"}
+                    placeholder=" "
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={[
+                      "peer w-full rounded-xl bg-white/5 pl-10 pr-16",
+                      "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
+                      "text-white placeholder-transparent",
+                      "border border-white/10 focus:border-violet-400/40",
+                      "outline-none transition-all duration-200",
+                      fieldErrs?.password
+                        ? "ring-1 ring-red-500/40"
+                        : "focus:ring-1 focus:ring-violet-400/30",
+                    ].join(" ")}
+                    autoComplete="new-password"
+                    aria-invalid={!!fieldErrs?.password}
+                  />
+                  <span
+                    className={[
+                      "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
+                      "top-[0.9rem] transition-all duration-200",
+                      "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
+                    ].join(" ")}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <rect
+                        x="5"
+                        y="11"
+                        width="14"
+                        height="9"
+                        rx="2"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
+                      <path
+                        d="M8 11V8a4 4 0 0 1 8 0v3"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
+                    </svg>
                   </span>
-                  <span className="font-medium">Lanjutkan dengan Google</span>
-                  {gLoading && (
+                  <label
+                    htmlFor="password"
+                    className={[
+                      "pointer-events-none absolute left-10 transition-all duration-200",
+                      "top-2 -translate-y-0 text-xs text-zinc-300",
+                      "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
+                      "peer-focus:top-2 peer-focus:-translate-y-0",
+                      "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
+                    ].join(" ")}
+                  >
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPass((v) => !v)}
+                    className={[
+                      "absolute right-2 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition",
+                      "top-[0.8rem] transition-all duration-200",
+                      "peer-focus:top-[1.05rem] peer-[&:not(:placeholder-shown)]:top-[1.05rem]",
+                    ].join(" ")}
+                    aria-label={
+                      showPass ? "Sembunyikan password" : "Tampilkan password"
+                    }
+                  >
+                    {showPass ? "Hide" : "Show"}
+                  </button>
+                </div>
+
+                <FE name="password" />
+
+                <div className="mt-1">
+                  <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className={`h-full bg-gradient-to-r ${pwd.barClass} transition-all duration-300`}
+                      style={{ width: pwd.width }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-zinc-400">
+                    Kekuatan: <span className="text-zinc-200">{pwd.label}</span>
+                    <span className="ml-1 text-zinc-500">
+                      ({password.length || 0} karakter)
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Konfirmasi Password */}
+              <div className="relative">
+                <input
+                  id="password2"
+                  type={showPass2 ? "text" : "password"}
+                  placeholder=" "
+                  value={password2}
+                  onChange={(e) => setPassword2(e.target.value)}
+                  className={[
+                    "peer w-full rounded-xl bg-white/5 pl-10 pr-14 text-white placeholder-transparent",
+                    "border border-white/10 focus:border-violet-400/40 outline-none transition-all duration-200",
+                    "pt-3 pb-3 focus:pt-5 [&:not(:placeholder-shown)]:pt-5",
+                    mismatch
+                      ? "ring-1 ring-amber-500/40"
+                      : "focus:ring-1 focus:ring-violet-400/30",
+                  ].join(" ")}
+                  autoComplete="new-password"
+                  aria-invalid={mismatch}
+                />
+                <span
+                  className={[
+                    "pointer-events-none absolute left-3 text-zinc-400 opacity-80",
+                    "top-[0.9rem] transition-all duration-200",
+                    "peer-focus:top-[1.15rem] peer-[&:not(:placeholder-shown)]:top-[1.15rem]",
+                  ].join(" ")}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M20 7 9 18l-5-5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <label
+                  htmlFor="password2"
+                  className={[
+                    "pointer-events-none absolute left-10 transition-all duration-200",
+                    "top-2 -translate-y-0 text-xs text-zinc-300",
+                    "peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-zinc-400",
+                    "peer-focus:top-2 peer-focus:-translate-y-0",
+                    "peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-0",
+                  ].join(" ")}
+                >
+                  Konfirmasi Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPass2((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition"
+                  aria-label={
+                    showPass2
+                      ? "Sembunyikan konfirmasi"
+                      : "Tampilkan konfirmasi"
+                  }
+                >
+                  {showPass2 ? "Hide" : "Show"}
+                </button>
+                {mismatch && (
+                  <p className="text-xs text-amber-300 mt-1">
+                    Konfirmasi password belum sama.
+                  </p>
+                )}
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={busy || !cfToken}
+                className={[
+                  "group relative w-full overflow-hidden rounded-xl px-4 py-3",
+                  "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white",
+                  "shadow-lg shadow-fuchsia-900/30",
+                  "transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]",
+                  "disabled:opacity-60 disabled:cursor-not-allowed",
+                ].join(" ")}
+              >
+                <span className="pointer-events-none absolute inset-0 translate-y-[-100%] bg-gradient-to-b from-white/20 to-transparent opacity-0 transition group-hover:opacity-100 group-hover:translate-y-0" />
+                <span className="inline-flex items-center justify-center gap-2 font-medium">
+                  {busy && (
                     <svg
-                      className="ml-auto size-4 animate-spin"
+                      className="size-4 animate-spin"
                       viewBox="0 0 24 24"
                       fill="none"
-                      aria-hidden
                     >
                       <circle
+                        className="opacity-25"
                         cx="12"
                         cy="12"
                         r="10"
                         stroke="currentColor"
                         strokeWidth="3"
-                        opacity=".25"
-                      />
+                      ></circle>
                       <path
+                        className="opacity-75"
                         d="M4 12a8 8 0 0 1 8-8"
                         stroke="currentColor"
                         strokeWidth="3"
-                      />
+                      ></path>
                     </svg>
                   )}
-                </button>
-              );
-            })()}
-            <div className="my-3 flex justify-center">
-              <TurnstileBox
-                onToken={setCfToken}
-                onExpire={() => setCfToken(null)} // penting: reset saat expired
-                className="scale-[.95] origin-center" // opsional styling
-              />
-            </div>
-          </div>
+                  {busy ? "Mendaftar…" : "Daftar"}
+                </span>
+              </button>
 
-          {/* Footer */}
-          <p className="text-sm text-zinc-400 text-center">
-            Sudah punya akun?{" "}
-            <Link
-              to="/"
-              className="text-white underline underline-offset-4 hover:opacity-90"
-            >
-              Masuk di sini
-            </Link>
-          </p>
+              <div className="relative my-4">
+                <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <span
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                   rounded-full border border-white/10 bg-zinc-900/70 px-3 py-1
+                   text-[11px] font-medium text-zinc-300 backdrop-blur"
+                >
+                  atau
+                </span>
+              </div>
+
+              {/* OR + Google (custom look, same flow) */}
+              <div className="relative">
+                {/* Button GIS (tak terlihat) */}
+                <div
+                  id="gsi-btn-reg"
+                  className="absolute inset-0 opacity-0 pointer-events-none [&>div]:w-full [&>div>div]:w-full"
+                />
+                {/* Custom proxy button */}
+                {(() => {
+                  const disabledGoogle = !cfToken || gLoading; // <— kunci di sini
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (disabledGoogle) {
+                          setErr(
+                            "Silakan verifikasi manusia (Cloudflare) terlebih dahulu."
+                          );
+                          return;
+                        }
+                        const host = document.getElementById("gsi-btn-reg");
+                        const btn =
+                          host?.querySelector('div[role="button"]') ||
+                          host?.firstElementChild;
+                        btn?.dispatchEvent(
+                          new MouseEvent("click", {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window,
+                          })
+                        );
+                      }}
+                      disabled={disabledGoogle}
+                      aria-disabled={disabledGoogle}
+                      title={
+                        disabledGoogle
+                          ? "Verifikasi manusia dulu"
+                          : "Lanjutkan dengan Google"
+                      }
+                      className={[
+                        "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3 border text-sm transition shadow-lg",
+                        disabledGoogle
+                          ? "bg-zinc-900/50 border-white/10 text-zinc-400 cursor-not-allowed grayscale"
+                          : "bg-zinc-900 hover:bg-zinc-800 border-white/10 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
+                      ].join(" ")}
+                    >
+                      <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
+                        <img
+                          src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
+                          alt=""
+                          className="w-4 h-4"
+                        />
+                      </span>
+                      <span className="font-medium">
+                        Lanjutkan dengan Google
+                      </span>
+                      {gLoading && (
+                        <svg
+                          className="ml-auto size-4 animate-spin"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            opacity=".25"
+                          />
+                          <path
+                            d="M4 12a8 8 0 0 1 8-8"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })()}
+                <div className="my-3 flex justify-center">
+                  <TurnstileBox
+                    onToken={setCfToken}
+                    onExpire={() => setCfToken(null)} // penting: reset saat expired
+                    className="scale-[.95] origin-center" // opsional styling
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <p className="text-sm text-zinc-400 text-center">
+                Sudah punya akun?{" "}
+                <Link
+                  to="/"
+                  className="text-white underline underline-offset-4 hover:opacity-90"
+                >
+                  Masuk di sini
+                </Link>
+              </p>
+            </>
+          ) : (
+            /* STEP: sent */
+            <div className="space-y-4 text-center">
+              <h1 className="text-2xl font-semibold">Cek email kamu</h1>
+              <p className="text-sm text-zinc-300/80">
+                Kami mengirim{" "}
+                <span className="text-white font-medium">
+                  tautan verifikasi
+                </span>{" "}
+                ke
+                <br />
+                <span className="text-white">{email}</span>.
+                <br />
+                Buka link tersebut untuk mengaktifkan akun.
+              </p>
+
+              {/* Kirim ulang tautan */}
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await apiPost(
+                      "/api/email/verification-notification",
+                      { email },
+                      { noAuth: true }
+                    );
+                    setErr(null);
+                    alert("Tautan verifikasi telah dikirim ulang.");
+                  } catch (e) {
+                    setErr(String(e?.message || "Gagal mengirim ulang."));
+                  }
+                }}
+                className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-sm"
+              >
+                Kirim ulang tautan
+              </button>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStep("form")}
+                  className="text-xs text-zinc-400 underline underline-offset-4 hover:text-zinc-200"
+                >
+                  Ganti email / isi ulang formulir
+                </button>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
