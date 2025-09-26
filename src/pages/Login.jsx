@@ -25,7 +25,6 @@ export default function Login({ embedded = false }) {
   const [gLoading, setGLoading] = useState(false);
   const [cfToken, setCfToken] = useState(null); // token
   const cfRef = useRef(null);
-  const [gisReady, setGisReady] = useState(false);
   useEffect(() => {
     cfRef.current = cfToken;
   }, [cfToken]);
@@ -68,34 +67,18 @@ export default function Login({ embedded = false }) {
   });
 
   useEffect(() => {
-  setGisReady(false);                // reset tiap kali dependencies berubah
-  if (ready && cfToken && googleBtnRef.current) {
-    // bersihkan lalu render ulang tombol GIS
-    googleBtnRef.current.innerHTML = "";
-    renderButton(googleBtnRef.current, {
-      theme: "filled_black",
-      size: "large",
-      shape: "pill",
-      text: "signin_with",
-      logo_alignment: "left",
-      width: "100%",
-    });
-
-    // tunggu 1 frame, lalu cek apakah tombol internalnya sudah ada
-    requestAnimationFrame(() => {
-      const realBtn = googleBtnRef.current?.querySelector('div[role="button"]');
-      if (realBtn) {
-        setGisReady(true);
-      } else {
-        // fallback: cek lagi setelah 300ms (jaga2 jaringan lambat)
-        setTimeout(() => {
-          const realBtn2 = googleBtnRef.current?.querySelector('div[role="button"]');
-          setGisReady(!!realBtn2);
-        }, 300);
-      }
-    });
-  }
-}, [ready, renderButton, cfToken]);
+    if (ready && cfToken && googleBtnRef.current) {
+      googleBtnRef.current.innerHTML = ""; // bersihkan biar tidak dobel
+      renderButton(googleBtnRef.current, {
+        theme: "filled_black",
+        size: "large",
+        shape: "pill",
+        text: "signin_with",
+        logo_alignment: "left",
+        width: "100%", // penting biar area klik/DOM pas
+      });
+    }
+  }, [ready, renderButton, cfToken]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -386,41 +369,36 @@ export default function Login({ embedded = false }) {
           {/* 2) Tombol custom yang tampil — klik ini memicu klik tombol GIS */}
           <button
             type="button"
-            disabled={gLoading || !ready || !cfToken || !gisReady}
             onClick={() => {
+              // cari elemen tombol dari GIS dan trigger click
               if (!cfToken) {
                 setErr(
                   "Silakan verifikasi manusia (Cloudflare) terlebih dahulu."
                 );
                 return;
               }
-              const realBtn =
-                googleBtnRef.current?.querySelector('div[role="button"]');
-              realBtn?.click(); // ✅ lebih andal di mobile
+              const btn =
+                googleBtnRef.current?.querySelector('div[role="button"]') ||
+                googleBtnRef.current?.firstElementChild;
+              btn?.dispatchEvent(
+                new MouseEvent("click", {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window,
+                })
+              );
             }}
-            onTouchEnd={(e) => {
-              // bantu iOS Safari supaya 1× tap
-              e.preventDefault();
-              const realBtn =
-                googleBtnRef.current?.querySelector('div[role="button"]');
-              realBtn?.click();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                const realBtn =
-                  googleBtnRef.current?.querySelector('div[role="button"]');
-                realBtn?.click();
-              }
-            }}
+            disabled={gLoading || !ready || !cfToken}
             className={[
               "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3",
               "bg-zinc-900 hover:bg-zinc-800 border border-white/10",
-              "text-zinc-100 text-sm transition shadow-lg shadow-black/20",
+              "text-zinc-100 text-sm transition",
+              "shadow-lg shadow-black/20",
               "disabled:opacity-60 disabled:cursor-not-allowed",
-              gisReady && cfToken && ready
-                ? "focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]"
-                : "grayscale",
+              "w-full inline-flex items-center justify-center gap-3 rounded-xl px-4 py-3 border text-sm transition shadow-lg",
+              !cfToken || !ready
+                ? "bg-zinc-900/50 border-white/10 text-zinc-400 cursor-not-allowed grayscale"
+                : "bg-zinc-900 hover:bg-zinc-800 border-white/10 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.99]",
             ].join(" ")}
           >
             <span className="inline-grid place-items-center w-6 h-6 rounded-md bg-white">
@@ -428,13 +406,9 @@ export default function Login({ embedded = false }) {
                 src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
                 alt=""
                 className="w-4 h-4"
-                loading="lazy"
-                decoding="async"
               />
             </span>
-            <span className="font-medium">
-              {!gisReady ? "Menyiapkan Google…" : "Login dengan Google"}
-            </span>
+            <span className="font-medium">Login dengan Google</span>
 
             {gLoading && (
               <svg
@@ -459,7 +433,6 @@ export default function Login({ embedded = false }) {
               </svg>
             )}
           </button>
-
           <div className="my-3 flex justify-center">
             <TurnstileBox
               onToken={setCfToken}
