@@ -11,7 +11,7 @@ export default function PagesToolbar({
   onAskDeletePage,
 }) {
   const stop = (e) => e.stopPropagation();
-   const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   async function handleCreatePage() {
     if (adding) return;
@@ -25,44 +25,57 @@ export default function PagesToolbar({
   return (
     <Card className="bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border-white/10 text-white">
       {/* Header */}
-       <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center gap-2">
-        <div className="w-1 h-6 bg-gradient-to-b from-fuchsia-500 to-violet-500 rounded-full" />
-        <h3 className="font-semibold text-lg">Pages</h3>
-        <div className="px-2 py-0.5 border border-white/10 bg-white/10 text-zinc-200 text-xs font-medium rounded-full">
-          {pages.length}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 bg-gradient-to-b from-fuchsia-500 to-violet-500 rounded-full" />
+          <h3 className="font-semibold text-lg">Pages</h3>
+          <div className="px-2 py-0.5 border border-white/10 bg-white/10 text-zinc-200 text-xs font-medium rounded-full">
+            {pages.length}
+          </div>
         </div>
-      </div>
 
-      <Primary
-        onClick={handleCreatePage}
-        disabled={adding}
-        aria-busy={adding}
-        className="inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-        title={adding ? "Menambah halaman..." : "Tambah halaman"}
-      >
-        {adding ? (
-          <>
-            <svg
-              className="h-4 w-4 animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity=".25" />
-              <path d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" strokeWidth="3" />
-            </svg>
-            <span className="hidden sm:inline">Menambah…</span>
-            <span className="sm:hidden">…</span>
-          </>
-        ) : (
-          <>
-            <span className="hidden sm:inline items-center gap-1">+ Tambah</span>
-            <span className="sm:hidden">+</span>
-          </>
-        )}
-      </Primary>
-    </div>
+        <Primary
+          onClick={handleCreatePage}
+          disabled={adding}
+          aria-busy={adding}
+          className="inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          title={adding ? "Menambah halaman..." : "Tambah halaman"}
+        >
+          {adding ? (
+            <>
+              <svg
+                className="h-4 w-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  opacity=".25"
+                />
+                <path
+                  d="M4 12a8 8 0 0 1 8-8"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                />
+              </svg>
+              <span className="hidden sm:inline">Menambah…</span>
+              <span className="sm:hidden">…</span>
+            </>
+          ) : (
+            <>
+              <span className="hidden sm:inline items-center gap-1">
+                + Tambah
+              </span>
+              <span className="sm:hidden">+</span>
+            </>
+          )}
+        </Primary>
+      </div>
 
       {/* Scroller */}
       <div
