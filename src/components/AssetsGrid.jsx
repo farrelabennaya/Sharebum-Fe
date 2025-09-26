@@ -168,38 +168,46 @@ export default function AssetsGrid_NoDrag({
             </button>
 
             {/* Toggle Reorder Mode */}
-            // Toggle Reorder Mode
-<button
-  type="button"
-  onClick={() => {
-    if (filterActive) return; // cegah toggle saat filter aktif
 
-    // kalau mau menyalakan reorder saat select aktif -> matikan select dulu
-    if (!reorderMode && selectMode) {
-      onClearSelect?.();
-      onToggleSelectMode?.(); // bikin selectMode = false
-    }
+            <button
+              type="button"
+              onClick={() => {
+                if (filterActive) return; // cegah toggle saat filter aktif
 
-    setReorderMode((v) => !v); // ✅ cukup sekali
-  }}
-  disabled={filterActive}
-  className={[
-    selectMode ? "hidden md:inline-flex" : "inline-flex",
-    "items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-all",
-    "active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 ring-violet-200",
-    reorderMode
-      ? "bg-violet-600 text-white border-violet-600"
-      : "bg-white border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50 text-black",
-    filterActive ? "opacity-50 cursor-not-allowed" : "",
-  ].join(" ")}
-  title={filterActive ? "Nonaktif saat filter aktif" : "Mode atur urutan tanpa drag"}
->
-  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-    <path d="M8 6h13M3 6h1m4 6h13M3 12h1m4 6h13M3 18h1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-  {reorderMode ? "Selesai" : "Reorder"}
-</button>
+                // kalau mau menyalakan reorder saat select aktif -> matikan select dulu
+                if (!reorderMode && selectMode) {
+                  onClearSelect?.();
+                  onToggleSelectMode?.(); // bikin selectMode = false
+                }
 
+                setReorderMode((v) => !v); // ✅ cukup sekali
+              }}
+              disabled={filterActive}
+              className={[
+                selectMode ? "hidden md:inline-flex" : "inline-flex",
+                "items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-all",
+                "active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 ring-violet-200",
+                reorderMode
+                  ? "bg-violet-600 text-white border-violet-600"
+                  : "bg-white border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50 text-black",
+                filterActive ? "opacity-50 cursor-not-allowed" : "",
+              ].join(" ")}
+              title={
+                filterActive
+                  ? "Nonaktif saat filter aktif"
+                  : "Mode atur urutan tanpa drag"
+              }
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                <path
+                  d="M8 6h13M3 6h1m4 6h13M3 12h1m4 6h13M3 18h1"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              {reorderMode ? "Selesai" : "Reorder"}
+            </button>
 
             {/* Hapus terpilih (hanya saat selectMode) */}
             {selectMode && (
