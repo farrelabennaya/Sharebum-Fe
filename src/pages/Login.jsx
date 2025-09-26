@@ -68,25 +68,34 @@ export default function Login({ embedded = false }) {
   });
 
   useEffect(() => {
-    setGisReady(false);
-    if (ready && cfToken && googleBtnRef.current) {
-      googleBtnRef.current.innerHTML = "";
-      renderButton(googleBtnRef.current, {
-        theme: "filled_black",
-        size: "large",
-        shape: "pill",
-        text: "signin_with",
-        logo_alignment: "left",
-        width: "100%",
-      });
-      // tunggu 1 frame lalu cek tombol internalnya sudah ada
-      requestAnimationFrame(() => {
-        const realBtn =
-          googleBtnRef.current?.querySelector('div[role="button"]');
-        setGisReady(!!realBtn);
-      });
-    }
-  }, [ready, renderButton, cfToken]);
+  setGisReady(false);                // reset tiap kali dependencies berubah
+  if (ready && cfToken && googleBtnRef.current) {
+    // bersihkan lalu render ulang tombol GIS
+    googleBtnRef.current.innerHTML = "";
+    renderButton(googleBtnRef.current, {
+      theme: "filled_black",
+      size: "large",
+      shape: "pill",
+      text: "signin_with",
+      logo_alignment: "left",
+      width: "100%",
+    });
+
+    // tunggu 1 frame, lalu cek apakah tombol internalnya sudah ada
+    requestAnimationFrame(() => {
+      const realBtn = googleBtnRef.current?.querySelector('div[role="button"]');
+      if (realBtn) {
+        setGisReady(true);
+      } else {
+        // fallback: cek lagi setelah 300ms (jaga2 jaringan lambat)
+        setTimeout(() => {
+          const realBtn2 = googleBtnRef.current?.querySelector('div[role="button"]');
+          setGisReady(!!realBtn2);
+        }, 300);
+      }
+    });
+  }
+}, [ready, renderButton, cfToken]);
 
   async function onSubmit(e) {
     e.preventDefault();
