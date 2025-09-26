@@ -170,17 +170,17 @@ export default function Verified() {
                   >
                     Masuk Sekarang
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => nav("/")}
                     className="flex-1 px-6 py-3 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium transition-all duration-200 backdrop-blur-sm hover:border-white/30 transform hover:scale-105 active:scale-95"
                   >
                     Ke Halaman Login
-                  </button>
+                  </button> */}
                 </div>
                 
                 <div className="text-center pt-4">
                   <p className="text-xs text-gray-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2 inline-block">
-                    ✅ Akun kamu sudah siap digunakan
+                    Akun kamu sudah siap digunakan
                   </p>
                 </div>
               </div>
