@@ -10,7 +10,7 @@ function CoverThumb({ album }) {
 
   if (!src) {
     return (
-      <div className="h-8 w-8 md:h-9 md:w-9 rounded-md border bg-zinc-100 grid place-items-center text-[9px] md:text-[10px] text-zinc-500">
+      <div className="h-11 w-11 md:h-12 md:w-12 rounded-md border bg-zinc-100 grid place-items-center text-[9px] md:text-[10px] text-zinc-500">
         No
         <br />
         Cover
@@ -23,7 +23,7 @@ function CoverThumb({ album }) {
       src={src}
       alt={`Cover ${album.title}`}
       loading="lazy"
-      className="h-8 w-8 md:h-9 md:w-9 rounded-md border object-cover"
+      className="h-11 w-11 md:h-12 md:w-12 rounded-md border object-cover"
       onError={(e) => {
         e.currentTarget.style.display = "none";
       }}
