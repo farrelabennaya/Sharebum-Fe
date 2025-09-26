@@ -7,12 +7,6 @@ import DeleteSelectedModal from "./modals/DeleteSelectModal";
 function makeOrderPayload(list) {
   return { order: Object.fromEntries(list.map((a, i) => [a.id, i])) };
 }
-function arrayMoveLocal(arr, from, to) {
-  const next = arr.slice();
-  const [moved] = next.splice(from, 1);
-  next.splice(to, 0, moved);
-  return next;
-}
 
 export default function AssetsGrid_NoDrag({
   assets = [],
@@ -43,7 +37,9 @@ export default function AssetsGrid_NoDrag({
   const orderedAssets = useMemo(() => {
     const arr = [...assets];
     arr.sort((a, b) => {
-      if (a.index != null && b.index != null) return a.index - b.index;
+      const ao = a.order ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.order ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
       const ad = a.created_at ? +new Date(a.created_at) : 0;
       const bd = b.created_at ? +new Date(b.created_at) : 0;
       return bd - ad;
@@ -56,6 +52,13 @@ export default function AssetsGrid_NoDrag({
     [orderedAssets]
   );
   const selectedCount = selected?.size || 0;
+
+  function arrayMoveLocal(arr, from, to) {
+    const next = arr.slice();
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    return next;
+  }
 
   async function persistReorder(nextList) {
     try {
@@ -75,7 +78,7 @@ export default function AssetsGrid_NoDrag({
     const to = Math.min(Math.max(from + delta, 0), ids.length - 1);
     if (to === from) return;
     const next = arrayMoveLocal(orderedAssets, from, to);
-    onOptimisticReorder?.(next.map((a, i) => ({ ...a, index: i })));
+    onOptimisticReorder?.(next.map((a, i) => ({ ...a, order: i })));
     persistReorder(next);
   }
 
@@ -88,7 +91,7 @@ export default function AssetsGrid_NoDrag({
     to = Math.min(Math.max(to, 0), ids.length - 1);
     if (to === from) return;
     const next = arrayMoveLocal(orderedAssets, from, to);
-    onOptimisticReorder?.(next.map((a, i) => ({ ...a, index: i })));
+    onOptimisticReorder?.(next.map((a, i) => ({ ...a, order: i })));
     persistReorder(next);
   }
 
