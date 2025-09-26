@@ -276,7 +276,7 @@ export default function Profile() {
                     >
                       Upload
                     </button>
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => setTab("url")}
                       className={[
@@ -285,7 +285,7 @@ export default function Profile() {
                       ].join(" ")}
                     >
                       Pakai URL
-                    </button>
+                    </button> */}
                   </div>
 
                   {tab === "upload" ? (
