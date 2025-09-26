@@ -10,6 +10,7 @@ export default function CreateAlbumModal({
 }) {
   const [show, setShow] = useState(false);
   const inputRef = useRef(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -35,6 +36,17 @@ export default function CreateAlbumModal({
   function handleKeyDown(e) {
     if (e.key === "Escape") onClose?.();
     if (e.key === "Enter" && canSubmit) onCreate?.();
+  }
+
+  async function handleCreate() {
+    if (submitting || !canSubmit) return;
+    try {
+      setSubmitting(true);
+      // asumsi onCreate mengembalikan Promise
+      await onCreate();
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -149,12 +161,40 @@ export default function CreateAlbumModal({
                 <Ghost onClick={onClose} className="hover:bg-white/5">
                   Batal
                 </Ghost>
+
                 <Primary
-                  onClick={onCreate}
-                  disabled={!canSubmit}
-                  className="disabled:opacity-60 disabled:cursor-not-allowed"
+                  onClick={handleCreate}
+                  disabled={!canSubmit || submitting}
+                  aria-busy={submitting}
+                  className="disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2"
                 >
-                  Buat
+                  {submitting ? (
+                    <>
+                      <svg
+                        className="h-4 w-4 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          opacity=".25"
+                        />
+                        <path
+                          d="M4 12a8 8 0 0 1 8-8"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                        />
+                      </svg>
+                      Membuat…
+                    </>
+                  ) : (
+                    "Buat"
+                  )}
                 </Primary>
               </div>
             </div>
