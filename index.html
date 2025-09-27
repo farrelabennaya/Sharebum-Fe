@@ -1,80 +1,71 @@
 <!doctype html>
 <html lang="id" dir="ltr" prefix="og: https://ogp.me/ns#">
   <head>
-    <!-- Essential Meta Tags -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- ===== Essential ===== -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    
-    <!-- SEO Meta Tags -->
     <title>YollBum - Platform Sharing Terdepan Indonesia | Share, Connect, Discover</title>
     <meta name="description" content="YollBum adalah platform sharing terdepan di Indonesia. Bagikan konten, terhubung dengan komunitas, dan temukan hal-hal menarik. Bergabunglah dengan ribuan kreator Indonesia sekarang!" />
-    <meta name="keywords" content="yollbum, sharing platform, konten kreator, social media indonesia, berbagi konten, komunitas online, platform digital indonesia" />
     <meta name="author" content="YollBum Team" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
-    <meta name="language" content="Indonesian" />
-    <meta name="geo.region" content="ID" />
-    <meta name="geo.country" content="Indonesia" />
-    
-    <!-- Open Graph / Facebook -->
+    <meta name="language" content="id" />
+    <link rel="canonical" href="https://www.yollbum.biz.id/" />
+
+    <!-- ===== Favicons & App Icons ===== -->
+    <!-- Simpel: satu ICO untuk kompatibilitas luas + PNG & SVG modern -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=1" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=1" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#8b5cf6" />
+    <meta name="msapplication-TileColor" content="#8b5cf6" />
+    <!-- Light/Dark theme-color agar address bar menyesuaikan -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f23" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- ===== Open Graph / Facebook ===== -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="YollBum" />
     <meta property="og:title" content="YollBum - Platform Sharing Terdepan Indonesia" />
     <meta property="og:description" content="Platform sharing terdepan di Indonesia. Bagikan konten, terhubung dengan komunitas, dan temukan hal-hal menarik bersama ribuan kreator Indonesia." />
-    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image" content="https://pub-04038db6fc954cf7b4864afb6d3d5179.r2.dev/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="YollBum - Platform Sharing Indonesia" />
-    <meta property="og:url" content="https://yollbum.com" />
+    <meta property="og:url" content="https://www.yollbum.biz.id/" />
     <meta property="og:locale" content="id_ID" />
-    
-    <!-- Twitter Card -->
+
+    <!-- ===== Twitter Card ===== -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@yollbum" />
     <meta name="twitter:creator" content="@yollbum" />
     <meta name="twitter:title" content="YollBum - Platform Sharing Terdepan Indonesia" />
     <meta name="twitter:description" content="Platform sharing terdepan di Indonesia. Bagikan konten, terhubung dengan komunitas, dan temukan hal-hal menarik." />
-    <meta name="twitter:image" content="/twitter-card.jpg" />
+    <meta name="twitter:image" content="https://www.yollbum.biz.id/twitter-card.jpg" />
     <meta name="twitter:image:alt" content="YollBum Platform" />
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://yollbum.com" />
-    
-    <!-- Favicons & Icons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#8b5cf6" />
-    <meta name="msapplication-TileColor" content="#8b5cf6" />
-    <meta name="theme-color" content="#8b5cf6" />
-    <meta name="color-scheme" content="dark light" />
-    
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="/site.webmanifest" />
-    
-    <!-- DNS Prefetch & Preconnect -->
+
+    <!-- ===== Networking Hints ===== -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
     <link rel="dns-prefetch" href="//challenges.cloudflare.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
-    
-    <!-- Critical CSS for Performance -->
+
+    <!-- ===== Critical CSS ===== -->
     <style>
-      /* Critical above-the-fold styles */
       :root {
         --primary: #8b5cf6;
         --background: #0f0f23;
         --foreground: #ffffff;
         color-scheme: dark light;
       }
-      
-      * {
-        box-sizing: border-box;
-      }
-      
+      *, *::before, *::after { box-sizing: border-box; }
       html {
         font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         line-height: 1.6;
@@ -82,10 +73,8 @@
         -webkit-tap-highlight-color: transparent;
         scroll-behavior: smooth;
       }
-      
       body {
         margin: 0;
-        padding: 0;
         background-color: var(--background);
         color: var(--foreground);
         font-synthesis: none;
@@ -94,76 +83,37 @@
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
       }
-      
-      #root {
-        min-height: 100vh;
-        min-height: 100dvh;
-        position: relative;
-      }
-      
-      /* Loading spinner */
+      #root { min-height: 100dvh; position: relative; }
       .app-loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-        z-index: 9999;
+        position: fixed; inset: 0; display: grid; place-items: center;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); z-index: 9999;
       }
-      
       .loading-spinner {
-        width: 50px;
-        height: 50px;
+        width: 50px; height: 50px;
         border: 3px solid rgba(139, 92, 246, 0.1);
-        border-top: 3px solid #8b5cf6;
-        border-radius: 50%;
+        border-top: 3px solid #8b5cf6; border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      /* Hide loading when React loads */
-      #root:not(:empty) + .app-loading {
-        display: none;
-      }
-      
-      /* Focus management */
+      @keyframes spin { to { transform: rotate(360deg); } }
+      #root:not(:empty) + .app-loading { display: none; }
       .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 6px;
-        background: var(--primary);
-        color: white;
-        padding: 8px;
-        border-radius: 4px;
-        text-decoration: none;
-        z-index: 10000;
-        font-weight: 600;
+        position: absolute; top: -40px; left: 6px; background: var(--primary);
+        color: white; padding: 8px; border-radius: 4px; text-decoration: none; z-index: 10000; font-weight: 600;
       }
-      
-      .skip-link:focus {
-        top: 6px;
-      }
+      .skip-link:focus { top: 6px; }
     </style>
-    
-    <!-- Structured Data -->
+
+    <!-- ===== Structured Data ===== -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "YollBum",
       "description": "Platform sharing terdepan di Indonesia untuk kreator konten",
-      "url": "https://yollbum.com",
+      "url": "https://www.yollbum.biz.id/",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://yollbum.com/logo.png",
+        "url": "https://www.yollbum.biz.id/logo.png",
         "width": 200,
         "height": 200
       },
@@ -176,7 +126,7 @@
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://yollbum.com/search?q={search_term_string}"
+          "urlTemplate": "https://www.yollbum.biz.id/search?q={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       },
@@ -185,7 +135,7 @@
         "name": "YollBum",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://yollbum.com/logo.png"
+          "url": "https://www.yollbum.biz.id/logo.png"
         }
       },
       "copyrightYear": "2024",
@@ -195,15 +145,14 @@
       }
     }
     </script>
-    
-    <!-- Organization Schema -->
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "YollBum",
-      "url": "https://yollbum.com",
-      "logo": "https://yollbum.com/logo.png",
+      "url": "https://www.yollbum.biz.id/",
+      "logo": "https://www.yollbum.biz.id/logo.png",
       "description": "Platform sharing terdepan di Indonesia",
       "foundingDate": "2024",
       "address": {
@@ -219,127 +168,56 @@
       }
     }
     </script>
-    
-    <!-- Preload Critical Resources -->
-    <link rel="modulepreload" href="/src/main.jsx" />
-    
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-    
-    <!-- Performance Monitoring (Google Analytics alternative) -->
-    <script>
-      // Performance monitoring
-      if ('performance' in window) {
-        window.addEventListener('load', function() {
-          setTimeout(function() {
-            const perfData = window.performance.timing;
-            const loadTime = perfData.loadEventEnd - perfData.navigationStart;
-            
-            // Log performance metrics
-            console.log('Page Load Time:', loadTime + 'ms');
-            
-            // Send to analytics if needed
-            // analytics.track('page_load_time', { duration: loadTime });
-          }, 0);
-        });
-      }
-    </script>
-    
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-              console.log('SW registered: ', registration);
-            })
-            .catch(function(registrationError) {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
-    </script>
-    
+
+    <!-- ===== Security notes =====
+      - X-XSS-Protection & X-Frame-Options via meta sudah deprecated/kurang efektif.
+      - Atur header security (CSP, HSTS, Frame-Options) di Vercel/Edge Middleware kalau perlu hardening.
+    -->
+
     <!-- Cloudflare Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <!-- Vite biasanya inject preload otomatis; ini opsional -->
+    <link rel="modulepreload" href="/src/main.jsx" />
   </head>
-  
+
   <body>
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- App Container -->
-    <div id="root" role="main" aria-label="YollBum Application">
-      <!-- Fallback content for users with JavaScript disabled -->
-      <noscript>
-        <div style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          padding: 2rem;
-          text-align: center;
-          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-          color: white;
-          font-family: system-ui, sans-serif;
-        ">
-          <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #8b5cf6;">YollBum</h1>
-          <p style="font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px;">
-            Platform sharing terdepan di Indonesia. Untuk mengakses YollBum, silakan aktifkan JavaScript di browser Anda.
-          </p>
-          <div style="
-            padding: 1rem 2rem;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 8px;
-            color: #a78bfa;
-          ">
-            JavaScript diperlukan untuk menjalankan aplikasi ini.
-          </div>
-        </div>
-      </noscript>
-    </div>
-    
-    <!-- Loading Fallback -->
-    <div class="app-loading">
-      <div style="text-align: center;">
-        <div class="loading-spinner"></div>
-        <p style="margin-top: 1rem; color: #8b5cf6; font-weight: 600;">Loading YollBum...</p>
+    <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+
+    <div id="root" role="main" aria-label="Aplikasi YollBum"></div>
+
+    <div class="app-loading" aria-hidden="true">
+      <div style="text-align:center">
+        <div class="loading-spinner" role="status" aria-label="Memuat"></div>
+        <p style="margin-top:1rem; color:#8b5cf6; font-weight:600;">Memuat YollBum...</p>
       </div>
     </div>
-    
-    <!-- Main Application Script -->
+
+    <noscript>
+      <div style="
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        min-height:100vh; padding:2rem; text-align:center;
+        background:linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); color:white; font-family:system-ui, sans-serif;">
+        <h1 style="font-size:2.5rem; margin-bottom:1rem; color:#8b5cf6;">YollBum</h1>
+        <p style="font-size:1.2rem; margin-bottom:2rem; max-width:600px;">
+          Platform sharing terdepan di Indonesia. Untuk mengakses YollBum, silakan aktifkan JavaScript di browser Anda.
+        </p>
+        <div style="padding:1rem 2rem; background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.3); border-radius:8px; color:#a78bfa;">
+          JavaScript diperlukan untuk menjalankan aplikasi ini.
+        </div>
+      </div>
+    </noscript>
+
+    <!-- Main App -->
     <script type="module" src="/src/main.jsx"></script>
-    
-    <!-- Error Boundary Fallback -->
+
+    <!-- Error Boundary (minimal, non-intrusive) -->
     <script>
-      window.addEventListener('error', function(event) {
-        console.error('Global error:', event.error);
-        
-        // Optional: Send error to monitoring service
-        // if (window.analytics) {
-        //   analytics.track('javascript_error', {
-        //     error: event.error.message,
-        //     stack: event.error.stack,
-        //     filename: event.filename,
-        //     lineno: event.lineno
-        //   });
-        // }
+      window.addEventListener('error', (e) => {
+        console.error('Global error:', e?.error || e?.message);
       });
-      
-      window.addEventListener('unhandledrejection', function(event) {
-        console.error('Unhandled promise rejection:', event.reason);
-        
-        // Optional: Send to monitoring service
-        // if (window.analytics) {
-        //   analytics.track('promise_rejection', {
-        //     reason: event.reason
-        //   });
-        // }
+      window.addEventListener('unhandledrejection', (e) => {
+        console.error('Unhandled promise rejection:', e?.reason);
       });
     </script>
   </body>
