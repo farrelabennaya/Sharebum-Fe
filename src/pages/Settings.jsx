@@ -267,7 +267,7 @@ export default function Settings() {
     }
     setSavingPass(true);
     try {
-      await apiPost("/api/me/change-password", {
+      await apiPost("/api/me/password", {
         current_password: oldPass,
         password: newPass,
         password_confirmation: newPass2,
