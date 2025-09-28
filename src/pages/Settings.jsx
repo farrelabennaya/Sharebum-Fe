@@ -91,7 +91,9 @@ function applyClientPrefs({ theme, reducedMotion, compact }) {
   } else {
     // system
     localStorage.removeItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
     root.classList.toggle("dark", prefersDark);
   }
 
@@ -120,6 +122,12 @@ export default function Settings() {
   // base state
   const [loading, setLoading] = React.useState(true);
   const [me, setMe] = React.useState(null);
+  // derived flags
+  // const hasGoogle = !!me?.google_id;
+  // const hasPassword = !!(me?.has_password ?? me?.password_set_at);
+
+  const hasPassword = !!me?.has_password;
+const hasGoogle   = !!me?.google_id;
 
   // messages
   const [msg, setMsg] = React.useState(null);
@@ -168,26 +176,36 @@ export default function Settings() {
         }
 
         setTheme(s.theme ?? localStorage.getItem("theme") ?? "dark");
-        setReducedMotion(!!(s.reduced_motion ?? localStorage.getItem("reducedMotion")));
+        setReducedMotion(
+          !!(s.reduced_motion ?? localStorage.getItem("reducedMotion"))
+        );
         setCompact(!!(s.compact ?? localStorage.getItem("compact")));
         setLocale(s.locale ?? "id");
 
         setDefaultVisibility(s.default_visibility ?? "private");
         setAllowCommentsDefault(
-          typeof s.allow_comments_default === "boolean" ? s.allow_comments_default : true
+          typeof s.allow_comments_default === "boolean"
+            ? s.allow_comments_default
+            : true
         );
         setAllowReactsDefault(
-          typeof s.allow_reacts_default === "boolean" ? s.allow_reacts_default : true
+          typeof s.allow_reacts_default === "boolean"
+            ? s.allow_reacts_default
+            : true
         );
 
         setNotifComments(
           typeof s.email_new_comment === "boolean" ? s.email_new_comment : true
         );
         setNotifReacts(
-          typeof s.email_new_reaction === "boolean" ? s.email_new_reaction : false
+          typeof s.email_new_reaction === "boolean"
+            ? s.email_new_reaction
+            : false
         );
         setNotifShares(
-          typeof s.email_album_shared === "boolean" ? s.email_album_shared : false
+          typeof s.email_album_shared === "boolean"
+            ? s.email_album_shared
+            : false
         );
 
         // apply instantly
@@ -257,6 +275,7 @@ export default function Settings() {
 
   async function changePassword(e) {
     e?.preventDefault?.();
+
     if (!newPass || newPass.length < 8) {
       flash("error", "Password baru minimal 8 karakter.");
       return;
@@ -265,19 +284,48 @@ export default function Settings() {
       flash("error", "Konfirmasi password tidak cocok.");
       return;
     }
+
+    // payload berbeda:
+    // - Email/password ATAU Google yang sudah punya password → wajib current_password
+    // - Google tanpa password → TIDAK perlu current_password (set pertama)
+    const payload = hasPassword
+      ? {
+          current_password: oldPass,
+          password: newPass,
+          password_confirmation: newPass2,
+        }
+      : {
+          password: newPass,
+          password_confirmation: newPass2,
+        };
+
+    if (hasPassword && !payload.current_password) {
+      flash("error", "Isi password saat ini.");
+      return;
+    }
+
     setSavingPass(true);
     try {
-      await apiPatch("/api/me/password", {
-        current_password: oldPass,
-        password: newPass,
-        password_confirmation: newPass2,
-      });
+      await apiPatch("/api/me/password", payload);
       setOldPass("");
       setNewPass("");
       setNewPass2("");
-      flash("ok", "Password berhasil diubah.");
+
+      // update flag lokal agar UI berubah jadi “Ganti Password”
+      if (!hasPassword) {
+        setMe((m) => ({
+          ...(m || {}),
+          has_password: true,
+          password_set_at: new Date().toISOString(),
+        }));
+      }
+
+      flash(
+        "ok",
+        hasPassword ? "Password berhasil diubah." : "Password berhasil disetel."
+      );
     } catch (e) {
-      flash("error", e?.message || "Gagal mengubah password.");
+      flash("error", e?.message || "Gagal menyimpan password.");
     } finally {
       setSavingPass(false);
     }
@@ -297,7 +345,10 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-950 to-black text-white">
       {/* ornaments */}
-      <div aria-hidden className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        aria-hidden
+        className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      >
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-violet-500/20 blur-3xl" />
         <div className="absolute -bottom-48 -right-32 w-[28rem] h-[28rem] rounded-full bg-fuchsia-500/15 blur-3xl" />
       </div>
@@ -335,140 +386,71 @@ export default function Settings() {
         ) : (
           <>
             {/* Preferensi Tampilan */}
-            {/* <Section
-              title="Preferensi Tampilan"
-              desc="Atur tema dan perilaku UI agar sesuai selera."
-            >
-              <Row label="Tema" hint="Gunakan sistem, gelap, atau terang.">
-                <div className="flex flex-wrap gap-2">
-                  <Select value={theme} onChange={setTheme}>
-                    <option value="system">Ikuti sistem</option>
-                    <option value="dark">Gelap</option>
-                    <option value="light">Terang</option>
-                  </Select>
-                  <Select value={locale} onChange={setLocale}>
-                    <option value="id">Indonesia</option>
-                    <option value="en">English</option>
-                  </Select>
-                </div>
-              </Row>
-
-              <Row label="Gerak & Kepadatan" hint="Kurangi animasi dan rapatkan spasi.">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Toggle
-                    checked={reducedMotion}
-                    onChange={setReducedMotion}
-                    label="Kurangi animasi"
-                  />
-                  <Toggle
-                    checked={compact}
-                    onChange={setCompact}
-                    label="Mode compact"
-                  />
-                </div>
-              </Row>
-
-              <div className="pt-2">
-                <Btn
-                  onClick={savePreferences}
-                  disabled={savingPref}
-                  className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white border-0"
-                >
-                  {savingPref ? "Menyimpan…" : "Simpan Preferensi"}
-                </Btn>
-              </div>
-            </Section> */}
-
-            {/* Privasi & Default Album */}
-            {/* <Section
-              title="Privasi & Default Album"
-              desc="Pengaturan default saat kamu membuat album baru."
-            >
-              <Row label="Visibilitas default" hint="Siapa yang bisa melihat album barumu?">
-                <Select value={defaultVisibility} onChange={setDefaultVisibility}>
-                  <option value="private">Private — hanya kamu</option>
-                  <option value="unlisted">Unlisted — siapa pun dengan link</option>
-                  <option value="public">Public — semua orang</option>
-                </Select>
-              </Row>
-
-              <Row label="Interaksi default">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Toggle
-                    checked={allowCommentsDefault}
-                    onChange={setAllowCommentsDefault}
-                    label="Izinkan komentar"
-                  />
-                  <Toggle
-                    checked={allowReactsDefault}
-                    onChange={setAllowReactsDefault}
-                    label="Izinkan reaksi emoji"
-                  />
-                </div>
-              </Row>
-
-              <div className="pt-2">
-                <Btn
-                  onClick={savePrivacy}
-                  disabled={savingPrivacy}
-                  className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white border-0"
-                >
-                  {savingPrivacy ? "Menyimpan…" : "Simpan Privasi"}
-                </Btn>
-              </div>
-            </Section> */}
-
-            {/* Notifikasi Email */}
-            {/* <Section
-              title="Notifikasi Email"
-              desc="Kamu akan menerima email sesuai pilihan berikut."
-            >
-              <div className="space-y-2">
-                <Toggle
-                  checked={notifComments}
-                  onChange={setNotifComments}
-                  label="Komentar baru di foto/album saya"
-                />
-                <Toggle
-                  checked={notifReacts}
-                  onChange={setNotifReacts}
-                  label="Reaksi emoji baru"
-                />
-                <Toggle
-                  checked={notifShares}
-                  onChange={setNotifShares}
-                  label="Album saya diakses/di-share"
-                />
-              </div>
-
-              <div className="pt-2">
-                <Btn
-                  onClick={saveNotif}
-                  disabled={savingNotif}
-                  className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white border-0"
-                >
-                  {savingNotif ? "Menyimpan…" : "Simpan Notifikasi"}
-                </Btn>
-              </div>
-            </Section> */}
 
             {/* Keamanan Akun */}
             <Section
               title="Keamanan Akun"
-              desc="Ganti password dan kelola sesi login."
+              desc={
+                hasGoogle && !hasPassword
+                  ? "Akun kamu terhubung Google. Setel password agar bisa login dengan email juga."
+                  : hasGoogle && hasPassword
+                  ? "Akun terhubung Google dan sudah punya password."
+                  : "Ganti password dan kelola sesi login."
+              }
             >
-              <form onSubmit={changePassword} className="space-y-3">
-                <Row label="Password saat ini">
-                  <input
-                    type="password"
-                    value={oldPass}
-                    onChange={(e) => setOldPass(e.target.value)}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    className="w-full md:w-96 rounded-xl border border-white/10 bg-zinc-800/70 px-3.5 py-2.5 text-sm outline-none focus:border-violet-400/40"
-                  />
-                </Row>
-                <Row label="Password baru" hint="Minimal 8 karakter.">
+              {/* Badge metode login */}
+              <div className="mb-1">
+                {hasGoogle ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-400/20">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M21 12a9 9 0 1 1-2.64-6.36"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                      <path
+                        d="M22 12h-9"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                    Login via Google
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-violet-500/10 text-violet-300 border border-violet-400/20">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 17a5 5 0 1 0-5-5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                      <path
+                        d="M3 21h18"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                    Login via Email
+                  </span>
+                )}
+              </div>
+
+              <form onSubmit={changePassword} className="space-y-3" noValidate>
+                {/* Field 'password saat ini' hanya muncul jika sudah punya password */}
+                {hasPassword && (
+                  <Row label="Password saat ini">
+                    <input
+                      type="password"
+                      value={oldPass}
+                      onChange={(e) => setOldPass(e.target.value)}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      className="w-full md:w-96 rounded-xl border border-white/10 bg-zinc-800/70 px-3.5 py-2.5 text-sm outline-none focus:border-violet-400/40"
+                    />
+                  </Row>
+                )}
+
+                <Row label={hasPassword ? "Password baru" : "Buat password"}>
                   <input
                     type="password"
                     value={newPass}
@@ -478,6 +460,7 @@ export default function Settings() {
                     className="w-full md:w-96 rounded-xl border border-white/10 bg-zinc-800/70 px-3.5 py-2.5 text-sm outline-none focus:border-violet-400/40"
                   />
                 </Row>
+
                 <Row label="Ulangi password baru">
                   <input
                     type="password"
@@ -489,29 +472,41 @@ export default function Settings() {
                   />
                 </Row>
 
+                {/* Hint khusus akun Google tanpa password */}
+                {hasGoogle && !hasPassword && (
+                  <p className="text-xs text-zinc-400">
+                    Kamu belum punya password karena akun dibuat dengan Google.
+                    Mengisi form ini akan menambahkan password sehingga kamu
+                    juga bisa login dengan email & password.
+                  </p>
+                )}
+
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   <Btn
                     type="submit"
-                    disabled={savingPass}
+                    disabled={
+                      savingPass ||
+                      !newPass ||
+                      newPass.length < 8 ||
+                      newPass !== newPass2 ||
+                      (hasPassword && !oldPass)
+                    }
                     className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white border-0"
                   >
-                    {savingPass ? "Menyimpan…" : "Ganti Password"}
+                    {savingPass
+                      ? "Menyimpan…"
+                      : hasPassword
+                      ? "Ganti Password"
+                      : "Setel Password"}
                   </Btn>
-
-                  {/* <button
-                    type="button"
-                    onClick={logoutAll}
-                    className="px-4 py-2.5 rounded-xl border border-red-400/40 text-red-200 hover:bg-red-500/10 text-sm"
-                    title="Keluar dari semua perangkat"
-                  >
-                    Logout semua sesi
-                  </button> */}
 
                   {msg && (
                     <span
                       className={
                         "text-sm ml-auto " +
-                        (msg.type === "ok" ? "text-emerald-300" : "text-red-300")
+                        (msg.type === "ok"
+                          ? "text-emerald-300"
+                          : "text-red-300")
                       }
                       role="status"
                     >
