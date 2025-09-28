@@ -37,8 +37,8 @@ export default function AssetsGrid_NoDrag({
   const orderedAssets = useMemo(() => {
     const arr = [...assets];
     arr.sort((a, b) => {
-      const ao = a.order ?? Number.MAX_SAFE_INTEGER;
-      const bo = b.order ?? Number.MAX_SAFE_INTEGER;
+    const ao = typeof a.order === "number" ? a.order : -1;
+ const bo = typeof b.order === "number" ? b.order : -1;
       if (ao !== bo) return ao - bo;
       const ad = a.created_at ? +new Date(a.created_at) : 0;
       const bd = b.created_at ? +new Date(b.created_at) : 0;
@@ -113,6 +113,39 @@ export default function AssetsGrid_NoDrag({
   React.useEffect(() => {
     if (filterActive && reorderMode) setReorderMode(false);
   }, [filterActive, reorderMode]);
+
+  React.useEffect(() => {
+  if (!Array.isArray(assets) || assets.length === 0) return;
+
+  // urutkan sesuai rule terbaru (tanpa side-effect)
+  const sorted = [...assets].sort((a, b) => {
+    const ao = typeof a.order === "number" ? a.order : -1;
+    const bo = typeof b.order === "number" ? b.order : -1;
+    if (ao !== bo) return ao - bo;
+    const ad = a.created_at ? +new Date(a.created_at) : 0;
+    const bd = b.created_at ? +new Date(b.created_at) : 0;
+    return bd - ad;
+  });
+
+  // cek apakah perlu dinormalisasi:
+  // - ada yang order-nya bukan i
+  // - atau ada yang order-nya null/undefined
+  const needsFix = sorted.some((a, i) => a.order !== i);
+
+  if (!needsFix) return;
+
+  // buat list normal (0..n-1) sesuai tampilan
+  const normalized = sorted.map((a, i) => ({ ...a, order: i }));
+
+  // update UI parent (optimistic)
+  onOptimisticReorder?.(normalized);
+
+  // persist ke server
+  apiPatch(`/api/pages/${pageId}/assets/reorder`, makeOrderPayload(normalized))
+    .catch(() => onNeedRefresh?.());
+  // catatan: kalau takut terlalu sering, Anda bisa tambahkan debounce/guard tambahan
+}, [assets, pageId, onOptimisticReorder, onNeedRefresh]);
+
 
   return (
     <>
