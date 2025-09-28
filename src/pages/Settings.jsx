@@ -335,7 +335,7 @@ export default function Settings() {
         ) : (
           <>
             {/* Preferensi Tampilan */}
-            <Section
+            {/* <Section
               title="Preferensi Tampilan"
               desc="Atur tema dan perilaku UI agar sesuai selera."
             >
@@ -377,10 +377,10 @@ export default function Settings() {
                   {savingPref ? "Menyimpan…" : "Simpan Preferensi"}
                 </Btn>
               </div>
-            </Section>
+            </Section> */}
 
             {/* Privasi & Default Album */}
-            <Section
+            {/* <Section
               title="Privasi & Default Album"
               desc="Pengaturan default saat kamu membuat album baru."
             >
@@ -416,10 +416,10 @@ export default function Settings() {
                   {savingPrivacy ? "Menyimpan…" : "Simpan Privasi"}
                 </Btn>
               </div>
-            </Section>
+            </Section> */}
 
             {/* Notifikasi Email */}
-            <Section
+            {/* <Section
               title="Notifikasi Email"
               desc="Kamu akan menerima email sesuai pilihan berikut."
             >
@@ -450,7 +450,7 @@ export default function Settings() {
                   {savingNotif ? "Menyimpan…" : "Simpan Notifikasi"}
                 </Btn>
               </div>
-            </Section>
+            </Section> */}
 
             {/* Keamanan Akun */}
             <Section
@@ -498,14 +498,14 @@ export default function Settings() {
                     {savingPass ? "Menyimpan…" : "Ganti Password"}
                   </Btn>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={logoutAll}
                     className="px-4 py-2.5 rounded-xl border border-red-400/40 text-red-200 hover:bg-red-500/10 text-sm"
                     title="Keluar dari semua perangkat"
                   >
                     Logout semua sesi
-                  </button>
+                  </button> */}
 
                   {msg && (
                     <span
