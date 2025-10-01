@@ -641,72 +641,410 @@ export default function LandingPage() {
         </section>
 
         {/* Fitur */}
-        <section
-          id="fitur"
-          className="relative px-4 py-16 md:py-28 supports-[content-visibility:auto]:[content-visibility:auto] supports-[content-visibility:auto]:[contain-intrinsic-size:1px_800px]"
-        >
-          <div className="max-w-6xl mx-auto">
-            {/* header */}
-            <div className="mb-10 md:mb-14">
-              <FadeIn direction="up" distance={20}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[12px] text-zinc-300">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-violet-400 motion-safe:animate-pulse" />
-                  Fitur utama
+        {/* ==================== Features Section (tema ungu) ==================== */}
+        <section id="features" className="relative px-4 py-16 md:py-24">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid gap-10 md:grid-cols-[1.05fr,0.95fr] items-start">
+              {/* LEFT: copy */}
+              <div className="relative">
+                <FadeIn direction="up" distance={18}>
+                  <span
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] tracking-wide
+                           border border-white/10 bg-white/5 text-zinc-300"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                    Fitur
+                  </span>
+                </FadeIn>
+
+                <FadeIn delay={80} direction="up" distance={22}>
+                  <h2 className="mt-4 text-[28px] md:text-5xl font-bold tracking-tight text-white">
+                    Blok-blok yang bikin
+                    <br className="hidden sm:block" /> platform kamu
+                    <span className="text-violet-300"> powerful.</span>
+                  </h2>
+                </FadeIn>
+
+                <FadeIn delay={150} direction="up" distance={22}>
+                  <p className="mt-3 text-sm md:text-base text-zinc-400 max-w-lg leading-relaxed">
+                    Bagikan album, atur akses, dan nikmati interaksi yang rapih.
+                    Semua ringan, cepat, dan ramah untuk semua device.
+                  </p>
+                </FadeIn>
+
+                <FadeIn delay={220} direction="up" distance={18}>
+                  <Link
+                    to="/register"
+                    className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold
+                       bg-violet-600 text-white hover:bg-violet-500 active:scale-95 transition"
+                  >
+                    Mulai gratis
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M5 12h14M13 5l7 7-7 7"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </Link>
+                </FadeIn>
+              </div>
+
+              {/* RIGHT: grid + floating card */}
+              <div className="relative">
+                {/* floating/tilted card */}
+                <FadeIn
+                  delay={80}
+                  direction="up"
+                  distance={28}
+                  className="hidden sm:block"
+                >
+                  <div
+                    className="absolute -top-10 -right-1 rotate-6 w-48 md:w-56 rounded-2xl
+                       bg-white/[0.06] border border-white/10 shadow-2xl shadow-black/40
+                       backdrop-blur-sm p-4 hover:rotate-3 transition-transform"
+                  >
+                    <div className="flex items-center gap-2 text-violet-300">
+                      <span className="inline-grid place-items-center w-8 h-8 rounded-lg bg-white/5 border border-white/10">
+                        {/* Lock icon */}
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        >
+                          <path
+                            d="M8 10V8a4 4 0 118 0v2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <rect x="5" y="10" width="14" height="9" rx="2" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-semibold text-white">
+                        Roles & Permissions
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[12px] text-zinc-400 leading-relaxed">
+                      Kontrol fleksibel untuk akses pengguna, views, dan aksi.
+                    </p>
+                  </div>
+                </FadeIn>
+
+                {/* grid 2x2 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                  {[
+                    {
+                      title: "Album & Akses",
+                      desc: "Publik/privat, undang via link, cabut kapan pun.",
+                      icon: (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        >
+                          <rect x="3" y="4" width="18" height="16" rx="2.5" />
+                          <circle cx="9" cy="9" r="1.7" />
+                          <path
+                            d="M7 15l3-3 4 4 3-3 3 3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      ),
+                    },
+                    {
+                      title: "Komentar & Reaksi",
+                      desc: "Diskusi rapi + emoji instan. Seru tapi nggak berisik.",
+                      icon: (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        >
+                          <path d="M21 12a7 7 0 01-7 7H8l-5 3 1.5-4A7 7 0 018 5h6a7 7 0 017 7z" />
+                          <path d="M9 12h6M9 9h8" strokeLinecap="round" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      title: "Performa Cepat",
+                      desc: "Optimasi gambar otomatis & lazy-load cerdas.",
+                      icon: (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        >
+                          <path
+                            d="M13 2L6 13h5l-1 9 7-11h-5l1-9z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      ),
+                    },
+                    {
+                      title: "Keamanan Data",
+                      desc: "Enkripsi, link unik, dan kontrol yang jelas.",
+                      icon: (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        >
+                          <path d="M12 3l8 4v5a8 8 0 11-16 0V7l8-4z" />
+                        </svg>
+                      ),
+                    },
+                  ].map((f, i) => (
+                    <FadeIn
+                      key={f.title}
+                      delay={120 + i * 80}
+                      direction="up"
+                      distance={22}
+                    >
+                      <div
+                        className="relative rounded-2xl border border-white/10 bg-white/[0.06] p-5
+                           shadow-[0_8px_40px_rgba(0,0,0,.35)] backdrop-blur
+                           hover:border-violet-400/40 hover:shadow-[0_20px_60px_rgba(124,58,237,.25)]
+                           transition-all group"
+                      >
+                        {/* icon */}
+                        <div
+                          className="inline-grid place-items-center w-10 h-10 rounded-xl bg-white/5 border border-white/10
+                                text-violet-300 group-hover:text-violet-200"
+                        >
+                          {f.icon}
+                        </div>
+
+                        <h3 className="mt-3 text-base md:text-lg font-semibold text-white">
+                          {f.title}
+                        </h3>
+                        <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                          {f.desc}
+                        </p>
+
+                        {/* subtle bottom glow */}
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute -bottom-2 inset-x-6 h-2 rounded-full
+                             bg-violet-600/30 blur-md opacity-0 group-hover:opacity-100 transition"
+                        />
+                      </div>
+                    </FadeIn>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ==================== Showcase: Berbagi Album ==================== */}
+        <section id="share-showcase" className="relative px-4 py-20 md:py-28">
+          <div className="max-w-6xl mx-auto text-center">
+            <FadeIn direction="up" distance={18}>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white">
+                Berbagi Album,{" "}
+                <span className="text-violet-200">Cepat & Seru</span>
+              </h2>
+            </FadeIn>
+
+            <FadeIn delay={80} direction="up" distance={18}>
+              <p className="mt-4 text-sm md:text-base text-zinc-400 max-w-3xl mx-auto">
+                Temukan album publik dari komunitas, atau buat private album
+                untuk lingkaranmu. Reaksi emoji & komentar hadir, tanpa drama
+                yang nggak perlu.
+              </p>
+            </FadeIn>
+
+            {/* cards */}
+            <div className="mt-10 md:mt-14 grid gap-6 md:grid-cols-2">
+              {/* LEFT: Discover public albums */}
+              <FadeIn delay={140} direction="up" distance={22}>
+                <div
+                  className="relative rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl
+                        shadow-[0_30px_120px_rgba(0,0,0,.4)] p-5 md:p-6 overflow-hidden"
+                >
+                  {/* ring halus */}
+                  <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
+                  {/* glow ungu */}
+                  <div
+                    aria-hidden
+                    className="absolute -left-16 -top-16 w-56 h-56 rounded-full bg-violet-600/20 blur-3xl"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-fuchsia-500/20 blur-3xl"
+                  />
+
+                  <p className="text-left text-zinc-300 text-sm md:text-[15px]">
+                    Jelajahi{" "}
+                    <span className="text-white font-medium">album publik</span>{" "}
+                    dari pengguna lain—like, beri reaksi, dan tinggalkan
+                    komentar.
+                  </p>
+
+                  {/* mock grid foto */}
+                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-black/30 p-2">
+                    {[
+                      "https://picsum.photos/id/1015/600/600",
+                      "https://picsum.photos/id/1039/600/600",
+                      "https://picsum.photos/id/1069/600/600",
+                      "https://picsum.photos/id/1024/600/600",
+                      "https://picsum.photos/id/1059/600/600",
+                      "https://picsum.photos/id/1074/600/600",
+                    ].map((url, i) => (
+                      <div
+                        key={i}
+                        className="relative aspect-square overflow-hidden rounded-xl ring-1 ring-white/10"
+                      >
+                        <img
+                          src={url}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                          loading="lazy"
+                          onError={(e) =>
+                            (e.currentTarget.src = `https://picsum.photos/seed/sa-fallback-${i}/400/400`)
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* emoji melayang */}
+                  <span className="absolute -top-2 right-8 text-lg select-none animate-[float_8s_ease-in-out_infinite]">
+                    😍
+                  </span>
+                  <span className="absolute bottom-8 -left-2 text-xl select-none animate-[float_9s_ease-in-out_infinite]">
+                    🔥
+                  </span>
+                  <span className="absolute top-12 -right-2 text-lg select-none animate-[float_7s_ease-in-out_infinite]">
+                    👏
+                  </span>
                 </div>
               </FadeIn>
 
-              <FadeIn delay={80} direction="up" distance={24}>
-                <h2 className="mt-3 text-2xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-white via-violet-100 to-fuchsia-200 bg-clip-text text-transparent">
-                  Apa saja di dalamnya?
-                </h2>
-              </FadeIn>
-
-              <FadeIn delay={150} direction="up" distance={24}>
-                <p className="mt-2 text-sm md:text-base text-zinc-400/90 max-w-2xl">
-                  Biar berbagi momen terasa gampang, rapih, dan fun—tanpa drama.
-                </p>
-              </FadeIn>
-            </div>
-
-            {/* grid compact */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-              {[
-                {
-                  title: "Album Publik & Privat",
-                  desc: "Atur visibilitas sesuai kebutuhan. Share ke semua orang atau kelompok tertentu dengan kontrol akses penuh.",
-                },
-                {
-                  title: "Lightbox Halus",
-                  desc: "Foto fullscreen dengan swipe/keyboard, animasi smooth, dan loading cepat.",
-                },
-                {
-                  title: "Reaksi Emoji",
-                  desc: "Tinggalkan reaksi instan tanpa ngetik. Ringan, seru, terasa hidup.",
-                },
-                {
-                  title: "Komentar Terstruktur",
-                  desc: "Diskusi rapi di tiap foto. Notifikasi ringan—info dapet, ganggu nggak.",
-                },
-                {
-                  title: "Link Sharing Aman",
-                  desc: "Tautan unik yang bisa dicabut kapan pun. Aman buat publik, tenang buat kamu.",
-                },
-                {
-                  title: "Performa Cepat",
-                  desc: "Optimasi gambar otomatis, lazy-load cerdas, UI ringan. Hemat kuota di semua device.",
-                },
-              ].map((feature, i) => (
-                <FadeIn
-                  key={feature.title}
-                  delay={i * 90}
-                  direction="up"
-                  distance={26}
+              {/* RIGHT: Create & Share */}
+              <FadeIn delay={200} direction="up" distance={22}>
+                <div
+                  className="relative rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl
+                        shadow-[0_30px_120px_rgba(0,0,0,.4)] p-5 md:p-6 overflow-hidden"
                 >
-                  <FeatureCard feature={feature} index={i} />
-                </FadeIn>
-              ))}
+                  <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
+                  <div
+                    aria-hidden
+                    className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-violet-600/20 blur-3xl"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute -left-20 -bottom-20 w-60 h-60 rounded-full bg-fuchsia-500/20 blur-3xl"
+                  />
+
+                  <p className="text-left text-zinc-300 text-sm md:text-[15px]">
+                    Buat album{" "}
+                    <span className="text-white font-medium">instan</span>,
+                    pilih visibilitas, dan bagikan link yang bisa dicabut kapan
+                    saja.
+                  </p>
+
+                  {/* mock UI pengaturan album */}
+                  <div className="mt-4 space-y-3">
+                    {/* bar judul */}
+                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                      <div className="h-2 w-28 rounded bg-white/10" />
+                      <div className="mt-3 h-2 w-44 rounded bg-white/10" />
+                    </div>
+
+                    {/* row: Privacy + Reactions toggle */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4 flex items-center justify-between">
+                        <div className="text-xs text-zinc-300">Privacy</div>
+                        <span className="inline-flex items-center gap-2 text-xs">
+                          <span className="px-2 py-0.5 rounded-full bg-white/10 border border-white/15 text-zinc-200">
+                            Private
+                          </span>
+                        </span>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4 flex items-center justify-between">
+                        <div className="text-xs text-zinc-300">Reactions</div>
+                        <span className="inline-flex items-center gap-1 text-base">
+                          👍 😍 🔥
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* dropzone + share link */}
+                    <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-white">
+                            {/* plus icon */}
+                            <svg
+                              viewBox="0 0 24 24"
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path
+                                d="M12 5v14M5 12h14"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm text-white">
+                              Upload Photos
+                            </div>
+                            <div className="text-xs text-zinc-400">
+                              Drag & drop atau pilih file
+                            </div>
+                          </div>
+                        </div>
+                        <button className="rounded-lg px-3 py-1.5 text-xs font-medium bg-white/10 border border-white/15 text-zinc-200 hover:bg-white/15 transition">
+                          Browse
+                        </button>
+                      </div>
+
+                      {/* share link bar */}
+                      <div className="mt-4 grid grid-cols-[1fr,auto] items-center gap-2 rounded-xl border border-white/10 bg-black/40 p-2">
+                        <div className="truncate text-xs text-zinc-400">
+                          https://share.album/aben-trip-2025
+                        </div>
+                        <button className="rounded-md px-2.5 py-1 text-[11px] bg-white/10 border border-white/15 text-zinc-200 hover:bg-white/15 transition">
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
             </div>
           </div>
+
+          {/* lembut aja biar nyatu dengan page kamu */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+          >
+            <div className="absolute inset-x-0 top-0 h-[38%] bg-gradient-to-b from-white/5 to-transparent opacity-20" />
+          </div>
+
+          {/* keyframes utk emoji floating (kalau blm ada) */}
+          <style>{`
+    @keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-6px)} 100%{transform:translateY(0)} }
+  `}</style>
         </section>
 
         {/* Cara Kerja */}
@@ -1104,116 +1442,143 @@ export default function LandingPage() {
         </section>
 
         {/* Footer */}
-       <footer className="relative px-4 py-14 md:py-16 border-t border-white/10">
-  {/* top hairline */}
-  <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-white/10" />
+        <footer className="relative px-4 py-14 md:py-16 border-t border-white/10 overflow-hidden">
+          {/* top accent line */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          />
 
-  <div className="max-w-6xl mx-auto">
-    {/* top row */}
-    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-      {/* brand */}
-      <div className="flex items-center gap-3">
-        <div
-          className="grid place-items-center w-9 h-9 rounded-xl text-white text-[11px] font-semibold
-                     bg-white/10 border border-white/15"
-        >
-          SA
-        </div>
-        <div>
-          <h3 className="text-base md:text-lg font-semibold text-white">Share Album</h3>
-          <p className="text-xs text-zinc-400">Simpel untukmu, seru buat semua.</p>
-        </div>
-      </div>
+          {/* soft ornaments */}
 
-      {/* quick nav */}
-      <nav aria-label="Footer" className="md:ml-auto">
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-          <li>
-            <a href="#fitur" className="text-zinc-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded">
-              Fitur
-            </a>
-          </li>
-          <li>
-            <a href="#cara-kerja" className="text-zinc-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded">
-              Cara kerja
-            </a>
-          </li>
-          <li>
-            <a href="#faq" className="text-zinc-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded">
-              FAQ
-            </a>
-          </li>
-        </ul>
-      </nav>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              {/* brand */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="grid place-items-center w-9 h-9 rounded-xl text-white text-[11px] font-semibold
+                        bg-[conic-gradient(from_180deg,theme(colors.violet.500),theme(colors.fuchsia.500))]
+                        shadow-[0_8px_24px_rgba(139,92,246,.35)]"
+                >
+                  SA
+                </div>
+                <div>
+                  <h3 className="text-base md:text-lg font-semibold text-white">
+                    Share Album
+                  </h3>
+                  <p className="text-xs text-zinc-400">
+                    Simpel untukmu, seru buat semua.
+                  </p>
+                </div>
+              </div>
 
-      {/* socials */}
-      <div className="flex items-center gap-2">
-        <a
-          href="#"
-          aria-label="X (Twitter)"
-          className="w-9 h-9 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 grid place-items-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-          title="X (Twitter)"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-zinc-200" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 4l16 16M20 4L4 20" />
-          </svg>
-        </a>
-        <a
-          href="#"
-          aria-label="Instagram"
-          className="w-9 h-9 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 grid place-items-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-          title="Instagram"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-zinc-200" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="5" />
-            <circle cx="12" cy="12" r="3.5" />
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-          </svg>
-        </a>
-        <a
-          href="#"
-          aria-label="GitHub"
-          className="w-9 h-9 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 grid place-items-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-          title="GitHub"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-zinc-200" fill="currentColor">
-            <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.68c-2.78.6-3.36-1.2-3.36-1.2-.46-1.16-1.12-1.47-1.12-1.47-.92-.63.07-.62.07-.62 1.02.07 1.56 1.05 1.56 1.05.9 1.54 2.36 1.1 2.94.84.09-.66.35-1.1.64-1.36-2.22-.26-4.55-1.12-4.55-4.98 0-1.1.39-2 .1-2.72 0 0 .84-.27 2.75 1.04A9.57 9.57 0 0 1 12 7.48c.85 0 1.7.12 2.5.36 1.9-1.31 2.74-1.04 2.74-1.04.2.72.1 1.62.05 2.72 0 3.87-2.34 4.72-4.57 4.98.36.3.69.9.69 1.84v2.73c0 .27.18.58.68.48A10 10 0 0 0 12 2z" />
-          </svg>
-        </a>
-      </div>
-    </div>
+              {/* quick nav */}
+              <nav className="flex items-center gap-4 text-sm">
+                <a
+                  href="#fitur"
+                  className="text-zinc-300 hover:text-white transition-colors"
+                >
+                  Fitur
+                </a>
+                <a
+                  href="#cara-kerja"
+                  className="text-zinc-300 hover:text-white transition-colors"
+                >
+                  Cara kerja
+                </a>
+                <a
+                  href="#faq"
+                  className="text-zinc-300 hover:text-white transition-colors"
+                >
+                  FAQ
+                </a>
+              </nav>
 
-    {/* bottom row */}
-    <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 items-center gap-4 text-xs text-zinc-400 md:grid-cols-3">
-      <p className="order-2 md:order-1">
-        © {new Date().getFullYear()} <span className="text-zinc-200">YollBum</span>. All Rights Reserved.
-      </p>
+              {/* socials */}
+              <div className="flex items-center gap-2">
+                <a
+                  href="#"
+                  aria-label="X (Twitter)"
+                  className="w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10
+                     grid place-items-center transition-colors"
+                  title="X (Twitter)"
+                >
+                  {/* X */}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-4 h-4 text-zinc-200"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M4 4l16 16M20 4L4 20" />
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10
+                     grid place-items-center transition-colors"
+                  title="Instagram"
+                >
+                  {/* IG */}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-4 h-4 text-zinc-200"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="3.5" />
+                    <circle
+                      cx="17.5"
+                      cy="6.5"
+                      r="1"
+                      fill="currentColor"
+                      stroke="none"
+                    />
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  aria-label="GitHub"
+                  className="w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10
+                     grid place-items-center transition-colors"
+                  title="GitHub"
+                >
+                  {/* GH */}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-4 h-4 text-zinc-200"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.68c-2.78.6-3.36-1.2-3.36-1.2-.46-1.16-1.12-1.47-1.12-1.47-.92-.63.07-.62.07-.62 1.02.07 1.56 1.05 1.56 1.05.9 1.54 2.36 1.1 2.94.84.09-.66.35-1.1.64-1.36-2.22-.26-4.55-1.12-4.55-4.98 0-1.1.39-2 .1-2.72 0 0 .84-.27 2.75 1.04A9.57 9.57 0 0 1 12 7.48c.85 0 1.7.12 2.5.36 1.9-1.31 2.74-1.04 2.74-1.04.2.72.1 1.62.05 2.72 0 3.87-2.34 4.72-4.57 4.98.36.3.69.9.69 1.84v2.73c0 .27.18.58.68.48A10 10 0 0 0 12 2z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
 
-      <div className="order-3 md:order-2 flex flex-wrap items-center gap-3 md:justify-center">
-        <a href="#" className="hover:text-zinc-300 transition-colors">Kebijakan Privasi</a>
-        <span className="opacity-30">•</span>
-        <a href="#" className="hover:text-zinc-300 transition-colors">Ketentuan</a>
-        <span className="opacity-30 hidden md:inline">•</span>
-        <a href="#" className="hover:text-zinc-300 transition-colors hidden md:inline">Cookie</a>
-      </div>
-
-      {/* optional language / region selector */}
-      <div className="order-1 md:order-3 md:justify-self-end">
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] hover:bg-white/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18" />
-          </svg>
-          ID • Indonesia
-        </button>
-      </div>
-    </div>
-  </div>
-</footer>
-
+            {/* bottom row */}
+            <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 items-center gap-3 text-xs text-zinc-400">
+              <p>
+                © {new Date().getFullYear()}{" "}
+                <span className="text-zinc-200">ShareBum</span>. Didedikasikan
+                untuk sodara Nopal, agar beliau menjadi lebih semangat lagi
+                menjalani hidup.
+              </p>
+              <div className="md:justify-self-end flex items-center gap-3">
+                <a href="#" className="hover:text-zinc-300 transition-colors">
+                  Kebijakan Privasi (Belum ada)
+                </a>
+                <span className="opacity-30">•</span>
+                <a href="#" className="hover:text-zinc-300 transition-colors">
+                  Ketentuan (Belum ada)
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
       </main>
 
       <FloatingActions />
