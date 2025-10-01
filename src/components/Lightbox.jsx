@@ -400,33 +400,33 @@ export default function LightboxPublic({
     prevScale.current = scale;
   }, [scale, chromeVisible]);
 
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key.toLowerCase() === "c") setShowComments((v) => !v);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  // useEffect(() => {
+  //   const onKey = (e) => {
+  //     if (e.key.toLowerCase() === "c") setShowComments((v) => !v);
+  //   };
+  //   window.addEventListener("keydown", onKey);
+  //   return () => window.removeEventListener("keydown", onKey);
+  // }, []);
 
-  useEffect(() => {
-    const onKey = (e) => {
-      const k = e.key.toLowerCase();
-      if (k === "c")
-        setShowComments((v) => {
-          const n = !v;
-          if (n) setPickerOpen(false);
-          return n;
-        });
-      if (k === "e")
-        setPickerOpen((v) => {
-          const n = !v;
-          if (n) setShowComments(false);
-          return n;
-        });
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  // useEffect(() => {
+  //   const onKey = (e) => {
+  //     const k = e.key.toLowerCase();
+  //     if (k === "c")
+  //       setShowComments((v) => {
+  //         const n = !v;
+  //         if (n) setPickerOpen(false);
+  //         return n;
+  //       });
+  //     if (k === "e")
+  //       setPickerOpen((v) => {
+  //         const n = !v;
+  //         if (n) setShowComments(false);
+  //         return n;
+  //       });
+  //   };
+  //   window.addEventListener("keydown", onKey);
+  //   return () => window.removeEventListener("keydown", onKey);
+  // }, []);
 
   useEffect(() => {
     function onDocClick(e) {
