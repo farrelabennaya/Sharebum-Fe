@@ -171,7 +171,7 @@ function FloatingActions() {
     >
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="p-3 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 shadow-lg shadow-fuchsia-900/30 hover:scale-110 active:scale-95 transition-all duration-200 group"
+        className="p-3 rounded-full bg-violet-500 shadow-lg shadow-fuchsia-900/30 hover:scale-110 active:scale-95 transition-all duration-200 group"
       >
         <svg
           width="20"
@@ -210,7 +210,7 @@ function FeatureCard({ feature, index }) {
         />
         <div className="relative mb-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <div className="w-6 h-6 rounded bg-gradient-to-r from-violet-500 to-fuchsia-500" />
+            <div className="w-6 h-6 rounded bg-violet-500" />
           </div>
         </div>
         <div className="relative">
@@ -382,7 +382,7 @@ export default function LandingPage() {
                 </svg>
                 <span className="relative">
                   Scroll untuk lihat apa itu Share Album
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 group-hover:w-full transition-all duration-300" />
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
                 </span>
               </button>
             )}
@@ -482,7 +482,7 @@ export default function LandingPage() {
                     <Link
                       to="/register"
                       className="group relative px-7 py-3.5 rounded-2xl font-semibold
-                         bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white
+                         bg-violet-500 text-white
                          shadow-2xl shadow-fuchsia-900/40 hover:shadow-fuchsia-900/60
                          hover:scale-[1.02] active:scale-[0.99] transition-all duration-200"
                     >
@@ -775,7 +775,7 @@ export default function LandingPage() {
                 <Link
                   to="/register"
                   className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium
-           bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white
+           bg-violet-500 text-white
            shadow-md hover:shadow-lg shadow-fuchsia-900/20
            hover:scale-[1.02] active:scale-95 transition will-change-transform"
                 >
@@ -846,7 +846,7 @@ export default function LandingPage() {
                     <Link
                       to="/register"
                       className="group relative inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm md:text-base font-semibold
-                         bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white
+                         bg-violet-500 text-white
                          shadow-lg shadow-fuchsia-900/30 transition-all duration-200
                          hover:scale-[1.02] active:scale-[0.98]"
                     >

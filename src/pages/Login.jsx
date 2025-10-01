@@ -308,7 +308,7 @@ export default function Login({ embedded = false }) {
           disabled={loading || !cfToken}
           className={[
             "group relative w-full overflow-hidden rounded-xl px-4 py-3",
-            "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white",
+            "bg-violet-500 text-white",
             "shadow-lg shadow-fuchsia-900/30",
             "transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]",
             "disabled:opacity-60 disabled:cursor-not-allowed",
@@ -433,11 +433,10 @@ export default function Login({ embedded = false }) {
               </svg>
             )}
           </button>
-          <div className="my-3 flex justify-center">
+          <div className="my-3">
             <TurnstileBox
               onToken={setCfToken}
-              onExpire={() => setCfToken(null)} // penting: reset saat expired
-              className="scale-[.95] origin-center" // opsional styling
+              onExpire={() => setCfToken(null)}
             />
           </div>
         </div>
